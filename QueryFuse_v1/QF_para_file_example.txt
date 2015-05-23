@@ -1,0 +1,106 @@
+
+#########################################################################################################
+# Standard parameters
+#########################################################################################################
+
+#working directory where a results and report directory will be created
+working_dir	  =	   /restricted/projectnb/montilab-p/LinGA_unprotected/ytan/TL_PCNSL/align/TL_03_pairend_tophat_out/random_fusion_background_generator/test_v2/TL_03_clear_on_HG.GRCh37.64.exons_9groups_ref/new_query_fuse/
+
+#file that contains query gene ID !! 2 or 3 columns with fastq | [fastq2]  | stub
+raw_filenames	  =	   /restricted/projectnb/montilab-p/LinGA_unprotected/ytan/TL_PCNSL/align/TL_03_pairend_tophat_out/random_fusion_background_generator/test_v2/TL_03_clear_on_HG.GRCh37.64.exons_9groups_ref/raw_filenames_new_QF.txt
+
+#aligned bam_file_location
+accepted_bam    = /restricted/projectnb/montilab-p/LinGA_unprotected/ytan/TL_PCNSL/align/TL_03_pairend_tophat_out/random_fusion_background_generator/test_v2/TL_03_clear_on_HG.GRCh37.64.exons_9groups_ref/accepted_hits.bam
+
+#unmapped bam_file_location
+unmapped_bam    = /restricted/projectnb/montilab-p/LinGA_unprotected/ytan/TL_PCNSL/align/TL_03_pairend_tophat_out/random_fusion_background_generator/test_v2/TL_03_clear_on_HG.GRCh37.64.exons_9groups_ref/unmapped.bam
+
+#Does the raw_filenames file have a header?
+raw_file_header =    FALSE
+
+#paired end reads?
+paired	=    TRUE
+
+#start pipeline from scratch or try to pick up at the last step that was performed successfully
+clean_run     =    FALSE
+
+#directory that contains all the python scripts (QF_path)
+scripts_dir    = 	 /net/ibx109/ibx109fs1/protected/individuals/ytan7/CBMrepository/utilities/tags/QueryFuse_v1.0
+
+#should everything also be printed on the command line
+verbose         =    TRUE
+
+#whole_gene_list.bed location
+whole_gene_list = /restricted/projectnb/montilab-p/LinGA_unprotected/ytan/TL_PCNSL/align/TL_03_pairend_tophat_out/whole_gene_list.bed
+
+#human_genome.fa location
+genome_fa   = /unprotected/projects/pulmseq/Bowtie2/hg19.fa
+
+#human_genome index for bowtie2 location
+tophat_genome_ref   = /unprotected/projects/pulmseq/Bowtie2/hg19
+
+#read len of input data
+read_len    =	99
+
+#standard deviation of fragment size (if you are not sure about this, give a big number, but should be <= read_len*2)
+read_std    =	50
+
+#minimum alignment percentage allowed
+Align_percent   = 98
+
+#R script path
+R_path  = /share/apps/R/R-2.12.2_gnu412_x86_64_vanilla/bin/ #for LinGA
+
+#perl script path
+Perl_path   = /share/apps/perl/perl-5.10.1_gnu412_x86_64/bin/ #for LinGA
+
+#python script path
+Python_path = /usr/bin/
+
+#blat script path
+blat_path   = /data/home/ytan7/Blat/blat	#for LinGA /protected/individuals/ytan7/Blat/
+
+#blat to query sensitive option: choose whether use sensitive mode of blat (" -stepSize=5 -repMatch=2253 ") 
+step_size_query=5 #default of blat is 11.But 5 is recommanded for blat to query in sensitive mode. 
+
+#blat to other sensitive option: choose whether use sensitive mode of blat (" -stepSize=5 -repMatch=2253 ")
+step_size_other=11 #default of is 11 as blat. Blat to all other genes are not necessary to run under sensitive mode.
+
+#minimum number of split reads required for a fusion event
+split_n = 1
+
+#minimum number of span reads required for a fusion event
+span_n = 1
+
+#minimum number of total supporting reads required for a fusion event
+sum_n = 2
+
+#the number of processors available in this run, which control the number of jobs can run parellelly.
+num_processors = 1
+
+#maximum waiting time. If it is 0, then no limit. If not 0, the job will stop if it is out of time.
+timeout = 0
+
+#minimum number of total spanning reads required for a span read only fusion event (default is 2)
+span_only_filter = 2
+
+#should I add samtools, bedtools, bowtie2, tophat into path?
+
+#########################################################################################################
+# QSUB parameters
+############################################################################################################################################
+
+#modules must be FALSE or modules to load
+modules = FALSE #for SCC: boost/boost_1_51_0_gnu446, samtools/samtools-0.1.19_gnu446, bowtie2/2.0.0, tophat/tophat-2.0.6_gnu446, bedtools/2.17.0, bamtools/20130116
+qsub_email          = ytan7@bu.edu
+qsub_send_email     = FALSE
+qsub_memory         = 2g
+qsub_suffix         = pbs
+qsub_PROJECT        = montilab-p
+qsub_MACHINE        = scc
+qsub_RUNTIME_LIMIT  = 96:00:00    
+qsub_wait_time      = 10
+qsub_num_processors = 4-8
+
+
+
