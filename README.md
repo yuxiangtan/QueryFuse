@@ -1,4 +1,5 @@
 QueryFuse
+
 QueryFuse is software package for gene fusion detection using RNA-Seq data on a list of genes of interested. By using the small gene list, QueryFuse can give report in a fast, accurate and sensitive way, which can also help users focus on the genes they mostly care about. The software use alignment output from general RNA-Seq aligners as the input to avoid unnecessary realignment and save time. Then it uses local aligner to cluster discordant paired end reads and locate the fusion boundary. The software integrates filters and ranking methods to reduce false positive and prioritize important events. Fusion events that have only spanning reads1 will be reported in the second category. Alignment graph with reference template and all the related supporting reads will be generated automatically.
 
 1Spanning reads: We define spanning reads as pair-end-aligned reads that have the fusion boundaries in the gap between the paired ends.
