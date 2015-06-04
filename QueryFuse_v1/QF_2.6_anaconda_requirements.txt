@@ -1,0 +1,10 @@
+samtools
+bedtools
+bamtools
+python
+boost<=1.51
+bowtie
+bowtie2
+r
+perl
+pysam
