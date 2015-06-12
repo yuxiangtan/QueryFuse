@@ -424,7 +424,7 @@ if __name__ == "__main__":
         #group_span_from_split_cmd="python "+QF_path+"fusion_report_span_from_split.py "+" "+FUSION_BREAK_POINT_SUM_COUNT_MERGE+" "+PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_ID_GOOD_PAIRED_ANNO_BED+" "+str(read_len)+" "+read_std+" "+WHOLE_FUSION_SUM+" "+FUSION_SPLIT_SPAN_SUPPORT+" "+FUSION_SPAN_ONLY
 	group_span_from_split_cmd_status=QF_all_modules.resume_func(group_span_from_split_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
 	resume_stat_loc=group_span_from_split_cmd_status[0]
-        QF_all_modules.key_step_check(group_span_from_split_cmd_status, step_name, log_whole, log_error)
+        QF_all_modules.optional_step_check(group_span_from_split_cmd_status, step_name, log_whole, log_error)
 	print "finished grouping the spanning reads by using the existing breakpoints defined by splitting reads"
         log_whole.write("finished grouping the spanning reads by using the existing breakpoints defined by splitting reads"+'\n')
         log_whole.write(time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))+'\n')

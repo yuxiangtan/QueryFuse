@@ -65,9 +65,14 @@ if not os.path.exists(data_span_n):
 			data_split.remove(row_split_i)
 	out_count=open(outfile_count,"w")
 	for row_split in range(len(data_split)):
-		line_split='\t'.join(data_split[row_split])
+		line_split='\t'.join(data_split[row_split][:-5])
 		split_num=data_split[row_split][10]
-		out_count.write(line_split+"\t0\t"+str(split_num)+"\n")
+		split_pval=data_split[row_split][11]
+		shift_length=data_split[row_split][12]
+		di_entropy=data_split[row_split][13]
+		multi_align=data_split[row_split][14]
+		out_count.write(line_split+"\t"+str(split_num)+"\t0\t"+str(split_num)+"\t"+split_pval+"\t"+shift_length+"\t"+di_entropy+"\t"+multi_align+"\n")
+
         sys.exit("Warning: "+data_span_n+" is not found")
 
 
