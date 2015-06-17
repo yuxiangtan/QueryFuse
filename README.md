@@ -41,25 +41,25 @@
 
 ##Output
 ###Final output
--For a specific sample, all the most important outputs are in the "results" folder and each query gene will have its own subfolder. The "whole_fusion_sum_filtered.txt" file is the key one with score and ranked result after filtering. The "whole_fusion_sum_all.txt" file contains all the detect fusions before filtering and has scores of features but no ranks. If you want to have a look at the detail graph of ranked fusion events, you can find it in the "fusion_supporting_graph_final" folder by the fusion details.
--There are three other folders in a run: "logs" folder with all running logs; "bams" folder with shared preprocess files for all queries; "intermedias" folder with query specific intermediate files for each query. 
+<li>For a specific sample, all the most important outputs are in the "results" folder and each query gene will have its own subfolder. The "whole_fusion_sum_filtered.txt" file is the key one with score and ranked result after filtering. The "whole_fusion_sum_all.txt" file contains all the detect fusions before filtering and has scores of features but no ranks. If you want to have a look at the detail graph of ranked fusion events, you can find it in the "fusion_supporting_graph_final" folder by the fusion details.</li>
+<li>There are three other folders in a run: "logs" folder with all running logs; "bams" folder with shared preprocess files for all queries; "intermedias" folder with query specific intermediate files for each query. </li>
 
 
 ###Identification
--PARTNER_GENE_NAME: the name of the partner gene, which can be ambiguous.
--PARTNER_GENE_ID: the ENSEMBL ID of the partner gene, which is unique.
--QUERY_GENE_NAME: the name of the query gene.
--QUERY_GENE_ID: the ENSEMBL ID of the query gene.
+<li>PARTNER_GENE_NAME: the name of the partner gene, which can be ambiguous.</li>
+<li>PARTNER_GENE_ID: the ENSEMBL ID of the partner gene, which is unique.</li>
+<li>QUERY_GENE_NAME: the name of the query gene.</li>
+<li>QUERY_GENE_ID: the ENSEMBL ID of the query gene.</li>
 
 ###Evidence 
--SPLIT_NUM: number of splitting reads supporting this fusion event. If it is fusion event with multiple alignments, the sum of all splitting reads is divided by the number of multiple locations.
--SPAN_NUM: number of spanning reads supporting this fusion event.
--SUPPORT_SUM_NUM: Total supporting read number of this fusion event. It is the sum of SPLIT_NUM and SPAN_NUM.
--SPLIT_PVAL: the value to indicate how well the splitting reads spread around the breakpoint. (The bigger, the better.) It is the p-value from the KS-test.
--SHIFT_RANGE: the length of shared sequence at the breakpoints of the pair of partners. Shifting the breakpoint in this region will not affect the fusion sequence. Biologically, this is locations that an enzyme can bind on and the double-strand DNA break or splicing event can happen at.
--DINUCLEOTIDE_ENTROPY: entropy of 16 possible dinucleotides around the breakpoint.
--MULTI-ALIGN_NUM: number of possible alignment locations for this fusion reference.
--RANK_SCORE: The sum of ranks of all previous features.
+<li>SPLIT_NUM: number of splitting reads supporting this fusion event. If it is fusion event with multiple alignments, the sum of all splitting reads is divided by the number of multiple locations.</li>
+<li>SPAN_NUM: number of spanning reads supporting this fusion event.</li>
+<li>SUPPORT_SUM_NUM: Total supporting read number of this fusion event. It is the sum of SPLIT_NUM and SPAN_NUM.</li>
+<li>SPLIT_PVAL: the value to indicate how well the splitting reads spread around the breakpoint. (The bigger, the better.) It is the p-value from the KS-test.</li>
+<li>SHIFT_RANGE: the length of shared sequence at the breakpoints of the pair of partners. Shifting the breakpoint in this region will not affect the fusion sequence. Biologically, this is locations that an enzyme can bind on and the double-strand DNA break or splicing event can happen at.</li>
+<li>DINUCLEOTIDE_ENTROPY: entropy of 16 possible dinucleotides around the breakpoint.</li>
+<li>MULTI-ALIGN_NUM: number of possible alignment locations for this fusion reference.</li>
+<li>RANK_SCORE: The sum of ranks of all previous features.</li>
 
 
 ###Annotation
