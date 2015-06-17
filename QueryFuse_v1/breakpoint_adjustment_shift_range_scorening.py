@@ -34,6 +34,8 @@ Usage: python breakpoint_adjustment_shift_range_scorening.py
 
 -F QueryFuse_path                                                                                               *[No default value]
 
+-l Read length                                                                   				[default value is 99]
+
 -a Align_percent: min percentage of alignment                                                                   [default value is 98]
 
 -R Rscript path 												[default value is Rscript]
@@ -139,6 +141,7 @@ if __name__ == "__main__":
     size_query=5
     size_other=11
     Align_percent=98
+    read_len=99
     
     ###get arguments(parameters)
     #all the names of parameters must in the optlist.
@@ -155,7 +158,7 @@ if __name__ == "__main__":
 	elif opt[0] == '-t': ref_template =opt[1]
 	elif opt[0] == '-T': genome_fa = opt[1]
 	elif opt[0] == '-F': QF_path = opt[1]
-	#elif opt[0] == '-l': read_len = int(opt[1])
+	elif opt[0] == '-l': read_len = int(opt[1])
 	#elif opt[0] == '-r': resume_stat = int(opt[1])
 	elif opt[0] == '-R': R_script =opt[1]
 	##elif opt[0] == '-P': Perl_path =opt[1]
@@ -336,9 +339,13 @@ if __name__ == "__main__":
     #blat to other and query
     cmd2="fastaFromBed -fi "+genome_fa+" -bed "+whole_gene_list_split_query_filter+" -fo "+genome_split_fa+" -name"
     
-    cmd3=blat_script+" -noHead -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(Align_percent)+" "+QUERY_FA+" "+ref_template+" "+ref_template+"query.psl"
+    #Adjust the align_percent to match the min match requirement for min length alignment.
+    min_len=25
+    mismatch_num=read_len*(100-Align_percent)/100
+    new_align_percent=(100*min_len-100*mismatch_num)/min_len
+    cmd3=blat_script+" -noHead -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(new_align_percent)+" "+QUERY_FA+" "+ref_template+" "+ref_template+"query.psl"
     
-    cmd4=blat_script+" -noHead -stepSize="+str(size_other)+" -repMatch="+str(repMatch_other)+" -minIdentity="+str(Align_percent)+" "+genome_split_fa+" "+ref_template+" "+ref_template+"other.psl"
+    cmd4=blat_script+" -noHead -stepSize="+str(size_other)+" -repMatch="+str(repMatch_other)+" -minIdentity="+str(new_align_percent)+" "+genome_split_fa+" "+ref_template+" "+ref_template+"other.psl"
     
     if SCC=="0":
         subprocess.call(cmd1, shell = True)

@@ -407,7 +407,7 @@ if __name__ == "__main__":
 	step_name="Breakpoint correction for merged events and shift range  in QF_summary_process.py"
         log_whole.write(step_name+'\n')
         next_step_name="Group the spanning reads by using the existing breakpoints defined by splitting reads in QF_summary_process.py"
-        bp_correct_cmd="python "+QF_path+"/breakpoint_adjustment_shift_range_scorening.py -o "+FUSION_BREAK_POINT_SUM_COUNT_MERGE_REF_FILT_ADJ+" -O "+SUBGRAPH_FOLDER+" -w "+whole_gene_list+" -g "+LOG_ERR+" -t "+ALL_REF_TEMP_FA+" -T "+genome_fa+" -F "+QF_path+" -a "+str(Align_percent)+" -Q "+query_bed+" -q "+QUERY_FA+" -i "+str(size_query)+" -I "+str(size_other)+" -f "+file_prefix
+        bp_correct_cmd="python "+QF_path+"/breakpoint_adjustment_shift_range_scorening.py -o "+FUSION_BREAK_POINT_SUM_COUNT_MERGE_REF_FILT_ADJ+" -O "+SUBGRAPH_FOLDER+" -w "+whole_gene_list+" -g "+LOG_ERR+" -t "+ALL_REF_TEMP_FA+" -T "+genome_fa+" -F "+QF_path+" -a "+str(Align_percent)+" -Q "+query_bed+" -q "+QUERY_FA+" -i "+str(size_query)+" -I "+str(size_other)+" -l "+str(read_len)+" -f "+file_prefix
 	bp_correct_cmd_status=QF_all_modules.resume_func(bp_correct_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
 	resume_stat_loc=bp_correct_cmd_status[0]
         QF_all_modules.key_step_check(bp_correct_cmd_status, step_name, log_whole, log_error)
@@ -424,7 +424,7 @@ if __name__ == "__main__":
         #group_span_from_split_cmd="python "+QF_path+"fusion_report_span_from_split.py "+" "+FUSION_BREAK_POINT_SUM_COUNT_MERGE+" "+PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_ID_GOOD_PAIRED_ANNO_BED+" "+str(read_len)+" "+read_std+" "+WHOLE_FUSION_SUM+" "+FUSION_SPLIT_SPAN_SUPPORT+" "+FUSION_SPAN_ONLY
 	group_span_from_split_cmd_status=QF_all_modules.resume_func(group_span_from_split_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
 	resume_stat_loc=group_span_from_split_cmd_status[0]
-        QF_all_modules.optional_step_check(group_span_from_split_cmd_status, step_name, log_whole, log_error)
+        QF_all_modules.optional_step_check(group_span_from_split_cmd_status, log_whole, log_error, "Grouping the spanning reads by using the existing breakpoints defined by splitting reads")
 	print "finished grouping the spanning reads by using the existing breakpoints defined by splitting reads"
         log_whole.write("finished grouping the spanning reads by using the existing breakpoints defined by splitting reads"+'\n')
         log_whole.write(time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))+'\n')
