@@ -1,41 +1,41 @@
 #QueryFuse
--QueryFuse is software package for gene fusion detection using RNA-Seq data on a list of genes of interested. By using the small gene list, QueryFuse can give report in a fast, accurate and sensitive way, which can also help users focus on the genes they mostly care about. The software use alignment output from general RNA-Seq aligners as the input to avoid unnecessary realignment and save time. Then it uses local aligner to cluster discordant paired end reads and locate the fusion boundary. The software integrates filters and ranking methods to reduce false positive and prioritize important events. Fusion events that have only spanning reads1 will be reported in the second category. Alignment graph with reference template and all the related supporting reads will be generated automatically.
--1Spanning reads: We define spanning reads as pair-end-aligned reads that have the fusion boundaries in the gap between the paired ends.
+<li>QueryFuse is software package for gene fusion detection using RNA-Seq data on a list of genes of interested. By using the small gene list, QueryFuse can give report in a fast, accurate and sensitive way, which can also help users focus on the genes they mostly care about. The software use alignment output from general RNA-Seq aligners as the input to avoid unnecessary realignment and save time. Then it uses local aligner to cluster discordant paired end reads and locate the fusion boundary. The software integrates filters and ranking methods to reduce false positive and prioritize important events. Fusion events that have only spanning reads1 will be reported in the second category. Alignment graph with reference template and all the related supporting reads will be generated automatically.</li>
+<li>1Spanning reads: We define spanning reads as pair-end-aligned reads that have the fusion boundaries in the gap between the paired ends.</li>
 
 
 ##Publications
 
 
 ##RNA-Seq Datasets
--Publicly available datasets are all described in the publication. The TL-03 sample location? (need to ask bejoern)
--A simulated test set (with 100 splitting reads and 26 spanning reads for each fusion) is in the simulation-test-data folder. (accepted_hits.bam, unmapped.bam and 1 simulated fusion list) Also, parameter_file.txt for this dataset is provided.(available in: http://smonti.bumc.bu.edu/~montilab/zoho/QueryFuse/simulated_data_example/)
+<li>Publicly available datasets are all described in the publication. The TL-03 sample location? (need to ask bejoern)</li>
+<li>A simulated test set (with 100 splitting reads and 26 spanning reads for each fusion) is in the simulation-test-data folder. (accepted_hits.bam, unmapped.bam and 1 simulated fusion list) Also, parameter_file.txt for this dataset is provided.(available in: http://smonti.bumc.bu.edu/~montilab/zoho/QueryFuse/simulated_data_example/)</li>
 
 
 
 ##Setup
--To run QueryFuse, you need to have anaconda installed in your Linux system.
--Get the QueryFuse code
--Download and untar/gunzip the QueryFuse code package to a directory. No further installation is needed for the code itself, but anaconda environment is needed. "dos2unix" (or similar commands) are recommended, in order to confirm all the files are in the correct format for your computer. Now, QueryFuse can only run under Linux/Unix, which supports shell script, because QueryFuse is written in shell, Python, Perl and R.
--Setup running environment using anaconda
--In each QueryFuse version, there will be a file called "anaconda_env_setting_readme.txt". Please follow it to set up the running environment. There are external tools required for running QueryFuse and they will all be setup by anaconda.
+<li>To run QueryFuse, you need to have anaconda installed in your Linux system.</li>
+<li>Get the QueryFuse code</li>
+<li>Download and untar/gunzip the QueryFuse code package to a directory. No further installation is needed for the code itself, but anaconda environment is needed. "dos2unix" (or similar commands) are recommended, in order to confirm all the files are in the correct format for your computer. Now, QueryFuse can only run under Linux/Unix, which supports shell script, because QueryFuse is written in shell, Python, Perl and R.</li>
+<li>Setup running environment using anaconda</li>
+<li>In each QueryFuse version, there will be a file called "anaconda_env_setting_readme.txt". Please follow it to set up the running environment. There are external tools required for running QueryFuse and they will all be setup by anaconda.</li>
 
 
 
 ##Reference Dataset (available in: http://smonti.bumc.bu.edu/~montilab/zoho/QueryFuse/reference_files/)
--1.	Genome.fa and build the bowtie index. For bowtie website. [Note: the fa file must use "chr*" as chromosome rather than use just 1-22, X, Y and M.] The hg19.fa I used can be also downloaded in the reference folder. (You need to build bowtie index yourself based on the fa by using "bowtie2-build".)
--2.	Gene annotation. They can be built in bio-mart. Columns to include and following this order. For example, the one for hg19 (hg19_whole_gene_list.bed in the reference folder). In order to have better extension, I generated a 5k bp extended version on both sides of each gene. (hg19_whole_gene_list_5k_expanded.bed in the reference folder). Because the chrM is shortly, need to pay attention that not to extent the boundary over chrM's length. However, generally, chrM is not considered in fusion detection and should be filtered out.)
+<li>1.	Genome.fa and build the bowtie index. For bowtie website. [Note: the fa file must use "chr*" as chromosome rather than use just 1-22, X, Y and M.] The hg19.fa I used can be also downloaded in the reference folder. (You need to build bowtie index yourself based on the fa by using "bowtie2-build".)</li>
+<li>2.	Gene annotation. They can be built in bio-mart. Columns to include and following this order. For example, the one for hg19 (hg19_whole_gene_list.bed in the reference folder). In order to have better extension, I generated a 5k bp extended version on both sides of each gene. (hg19_whole_gene_list_5k_expanded.bed in the reference folder). Because the chrM is shortly, need to pay attention that not to extent the boundary over chrM's length. However, generally, chrM is not considered in fusion detection and should be filtered out.)</li>
 
 
 
-##Input data format
--QueryFuse now takes only paired end aligned bam file from aligners as input. To convert sam to bam, samtools command "samtools view" can be used.
+##Input data format</li>
+<li>QueryFuse now takes only paired end aligned bam file from aligners as input. To convert sam to bam, samtools command "samtools view" can be used.</li>
 
 
 
 ##How to run
--Running QueryFuse is as simple as running a single command line by just typing "python QF_path/QF_multi_query_warpper.py parameter_file". The parameter file should include all the parameters listed below. (But you can also type in the parameter in the command line without changing the parameter file.)
--[Details of all parameters: please see the QF_para_file_example.txt in each QueryFuse version.]
-*Note: the output directory should be different from the directory containing the input bam file.*
+<li>Running QueryFuse is as simple as running a single command line by just typing "python QF_path/QF_multi_query_warpper.py parameter_file". The parameter file should include all the parameters listed below. (But you can also type in the parameter in the command line without changing the parameter file.)</li>
+<li>[Details of all parameters: please see the QF_para_file_example.txt in each QueryFuse version.]</li>
+<li>*Note: the output directory should be different from the directory containing the input bam file.*</li>
 
 
 
@@ -63,9 +63,9 @@
 
 
 ###Annotation
--CHR_PARTNER_GENE: the chromosome of the partner gene.
--BREAKPOINT_PARTNER_GENE: the breakpoint location of the partner gene.
--DIRECTION_PARTNER_GENE: the chromosomal connection direction of the partner gene. ("F" means forward direction, which means it is 3' end on plus strand or 5' end on the minus strand and the detected arm is on the left (side with smaller location number than the breakpoint) of a chromosome. "R" means reverse direction, which means it is 5' end on the plus strand or 3' end on the minus strand and the detected arm is on the right (side with bigger location number than the breakpoint) of a chromosome.
--CHR_QUERY_GENE: the chromosome of the query gene
--BREAKPOINT_QUERY_GENE: the breakpoint location of the query gene.
--DIRECTION_QUERY_GENE: the chromosomal connection direction of the query gene.
+<li>CHR_PARTNER_GENE: the chromosome of the partner gene.</li>
+<li>BREAKPOINT_PARTNER_GENE: the breakpoint location of the partner gene.</li>
+<li>DIRECTION_PARTNER_GENE: the chromosomal connection direction of the partner gene. ("F" means forward direction, which means it is 3' end on plus strand or 5' end on the minus strand and the detected arm is on the left (side with smaller location number than the breakpoint) of a chromosome. "R" means reverse direction, which means it is 5' end on the plus strand or 3' end on the minus strand and the detected arm is on the right (side with bigger location number than the breakpoint) of a chromosome.</li>
+<li>CHR_QUERY_GENE: the chromosome of the query gene</li>
+<li>BREAKPOINT_QUERY_GENE: the breakpoint location of the query gene.</li>
+<li>DIRECTION_QUERY_GENE: the chromosomal connection direction of the query gene.</li>
