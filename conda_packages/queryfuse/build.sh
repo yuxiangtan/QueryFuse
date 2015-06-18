@@ -2,8 +2,8 @@
 
 mkdir -p $PREFIX/bin
 mkdir -p $PREFIX/lib/QueryFuse
-#> $PREFIX/bin/qf_wrapper
-echo <<EOF > foo.bar 
+
+echo <<EOF $PREFIX/bin/qf_wrapper
 #!/bin/env bash
 SCRIPT_DIR=\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )
 QF_DIR=\$( cd \$SCRIPT_DIR/../lib/QueryFuse && pwd )
