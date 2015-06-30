@@ -39,6 +39,18 @@ bowtie2, samtools, bedtools are need to reinstall and preloaded by anaconda.
 
 """
 ##intial functions
+def run_proc_prepare(param,query,result_outdir):
+    out_log=sync_cmd(cmd_prepare_for_query(param,query,result_outdir))
+    return(out_log)
+
+def run_proc_pair(param,query):
+    out_log=async_cmd(cmd_paired_end_for_query(param,query))
+    return(out_log)
+
+def run_proc_single(param,query):
+    out_log=async_cmd(cmd_single_end_for_query(param,query))
+    return(out_log)
+
 def each_query(param):
     # Extract real values from param dict
     num_parallels = param['num_processors']
@@ -106,7 +118,7 @@ def each_query(param):
                 #print "Hold at the waiting line"
                 cur_num_procs -= wait_for(processes, results, timeout)
             # Launch jobs for this query
-            proc_prepare[query] = sync_cmd(cmd_prepare_for_query(param,query,result_outdir))
+            proc_prepare[query] = run_proc_prepare(param,query,result_outdir)
             h_prepare_OUT=open(log_outdir_prepare_for_query+"out.log","w")
             h_prepare_OUT.write(proc_prepare[query][0]+proc_prepare[query][1])
             h_prepare_OUT.close()
@@ -121,8 +133,8 @@ def each_query(param):
             else:
                 QF_all_modules.writeLog('finished preparing for '+query+' in each_query module\n',param)
                 QF_all_modules.writeLog(time.strftime('%Y-%m-%d %A %X %Z',time.localtime(time.time()))+" \n",param)
-            proc_pair = async_cmd(cmd_paired_end_for_query(param,query))
-            proc_single = async_cmd(cmd_single_end_for_query(param,query))
+            proc_pair = run_proc_pair(param,query)
+            proc_single = run_proc_single(param,query)
             # Store jobs about this query in a dictionary
             jobs = dict(single = proc_single, pair = proc_pair)
             processes[query] = jobs
@@ -159,6 +171,7 @@ def each_query(param):
             log_outdir = param['LOG_F']+query+'/'
             
             #run_log?????? preprocess (it is not at this level), pair, single, summary each have one run log? And a log for each of these big step?
+            log_outdir_prepare_for_query = log_outdir+"log_of_prepare_for_query/"
             log_outdir_paired_end = log_outdir+"log_of_paired_end_run/"
             log_outdir_single_end = log_outdir+"log_of_singleton_unmapped_run/"
             log_outdir_summary = log_outdir+"log_of_summary_run/"
@@ -174,6 +187,9 @@ def each_query(param):
                 
             if not os.path.exists(log_outdir):
                 os.makedirs(log_outdir)
+            
+            if not os.path.exists(log_outdir_prepare_for_query):
+                os.makedirs(log_outdir_prepare_for_query)
             
             if not os.path.exists(log_outdir_paired_end):
                 os.makedirs(log_outdir_paired_end)
