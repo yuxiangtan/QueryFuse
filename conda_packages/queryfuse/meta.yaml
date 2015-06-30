@@ -3,10 +3,10 @@ package:
   version: {{ environ.get('GIT_DESCRIBE_TAG', '0.0.0') }}
 source:
   # or from git:
-  git_url: https://github.com/yuxiangtan/QueryFuse.git
+  git_url: https://github.com/yannpaul/QueryFuse.git
   # once we have a release, uncomment next line and change it to match
   # release tag name
-  # git_tag: 1.1.4
+  git_tag: conda_work
 
 build:
 
