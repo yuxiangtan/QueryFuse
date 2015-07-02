@@ -38,6 +38,9 @@ bowtie2, samtools, bedtools are need to reinstall and preloaded by anaconda.
 ============================
 
 """
+
+import os.path
+
 ##intial functions
 def run_proc_prepare(param,query,result_outdir):
     out_log=sync_cmd(cmd_prepare_for_query(param,query,result_outdir))
@@ -483,7 +486,7 @@ if __name__ == "__main__":
     
     if '-h' in list_args:
         print __doc__
-        sys.exit(1)
+        sys.exit(0)
     elif len(list_args) <2 or '-p' not in list_args:
         print __doc__
         sys.exit(1)
@@ -493,6 +496,8 @@ if __name__ == "__main__":
     
     #if we resume we specify the old parameter file
     QF_all_modules.initialize_standard(param)
+    param['script_dir'] = os.path.dirname(__file__)
+    param['QF_path'] = os.path.dirname(__file__)
     QF_all_modules.write_updated_file(updates, param, parameter_file)
 
     #QF_all_modules.initialize_qsub(param)#looks like this is not needed any more since I am not using nested qsub to submit jobs but using waiting for loop function.
