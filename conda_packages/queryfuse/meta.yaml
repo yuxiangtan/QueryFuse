@@ -28,7 +28,7 @@ requirements:
 
 test:
   commands:
-    - qf_wrapper -h
+    - QF_wrapper -h
 
 about:
   home: https://github.com/yuxiangtan/QueryFuse
