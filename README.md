@@ -14,10 +14,10 @@
 
 ##Setup
 <li>To run QueryFuse, you need to have anaconda installed in your Linux system.</li>
-<li>Get the QueryFuse code</li>
-<li>Download and untar/gunzip the QueryFuse code package to a directory. No further installation is needed for the code itself, but anaconda environment is needed. "dos2unix" (or similar commands) are recommended, in order to confirm all the files are in the correct format for your computer. Now, QueryFuse can only run under Linux/Unix, which supports shell script, because QueryFuse is written in shell, Python, Perl and R.</li>
-<li>Setup running environment using anaconda</li>
-<li>In each QueryFuse version, there will be a file called "anaconda_env_setting_readme.txt". Please follow it to set up the running environment. There are external tools required for running QueryFuse and they will all be setup by anaconda.</li>
+<li>After that, you need to get QueryFuse from binstar and create the running environment by:</li>
+<li> conda create -c yuxiang queryfuse -n $env_name #(Recommendation: use QF with version number is the env_name.) </li>
+<li>Once it is setup correctly, it will tell you how to activate the environment. </li>
+
 
 
 
@@ -33,7 +33,9 @@
 
 
 ##How to run
-<li>Running QueryFuse is as simple as running a single command line by just typing "python QF_path/QF_multi_query_warpper.py parameter_file". The parameter file should include all the parameters listed below. (But you can also type in the parameter in the command line without changing the parameter file.)</li>
+<li>Before running QueryFues, you need to activate the QueryFuse environment by:</li>
+<li> source activate $env_name #(The one used in the setup step) </li>
+<li>Running QueryFuse is as simple as running a single command line by just typing "QF_wrapper.py -p parameter_file". The parameter file should include all the parameters listed below. (But you can also type in the parameter in the command line without changing the parameter file.)</li>
 <li>[Details of all parameters: please see the QF_para_file_example.txt in each QueryFuse version.]</li>
 <li>*Note: the output directory should be different from the directory containing the input bam file.*</li>
 
