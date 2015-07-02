@@ -3,7 +3,7 @@
 mkdir -p $PREFIX/bin
 mkdir -p $PREFIX/lib/QueryFuse
 
-cat <<EOF >$PREFIX/bin/qf_wrapper
+cat <<EOF >$PREFIX/bin/QF_wrapper
 #!/bin/env bash
 SCRIPT_DIR=\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )
 QF_DIR=\$( cd \$SCRIPT_DIR/../lib/QueryFuse && pwd )
