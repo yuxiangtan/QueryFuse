@@ -18,10 +18,10 @@
 #GSFQ_pair_A.sh
 
 
-if [ $# -ne 11 ]
+if [ $# -ne 12 ]
 then
   echo ""
-    echo "Usage: QF_pair_A.sh File_prefix BAM_file_folder_prefix result_folder_prefix whole_gene_list.bed human_genome.fa read_length tophat_genome_reference LOG_ERROR QF_path Align_percent size_query"
+    echo "Usage: QF_pair_A.sh File_prefix BAM_file_folder_prefix result_folder_prefix whole_gene_list.bed human_genome.fa read_length tophat_genome_reference LOG_ERROR QF_path Align_percent size_query MIN_SCORE"
     echo ""
     echo "File_prefix - The folder that all the defualt can use (for intermedia files)."
     echo "BAM_file_folder_prefix - that has all three needed input bam files."
@@ -34,6 +34,7 @@ then
     echo "QueryFuse_path - QueryFuse path."
     echo "Align_percent"
     echo "size_query - step_size for blat to query"
+    echo "minscore parameter for blat (which will define the min alignment length allowed)"
     echo ""
     exit 1
 fi
@@ -82,7 +83,8 @@ LOG_ERROR=$8
 QF_path=${9}
 Align_percent=${10}
 size_query=${11}
-rep_match=$((1024*11/size_query))
+MIN_SCORE=${12}
+#rep_match=$((1024*11/size_query))
 #Build the name for files
 PAIR_BAM=$bam_fd"paired.bam"
 PAIR_SORT=$file_prefix"paired_sorted"
@@ -97,12 +99,6 @@ PAIR_TO_QUERY_FILTER_ID_UNIQ=$PAIR_SORT"_to_query_filter_ID_uniq.txt"
 PAIR_TO_QUERY_FILTER_ID_SAM=$PAIR_SORT"_to_query_filter_ID.sam"
 PAIR_TO_QUERY_FILTER_ID_UNIQ_FA=$PAIR_SORT"_to_query_filter_ID_uniq.fa"
 PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL=$PAIR_SORT"_to_query_filter_ID_uniq_on_query.psl"
-PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_ID=$PAIR_SORT"_to_query_filter_ID_uniq_on_query_span_ID.txt"
-PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_PSL=$PAIR_SORT"_to_query_filter_ID_uniq_on_query_span.psl"
-PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_PSL=$PAIR_SORT"_to_query_filter_ID_uniq_on_query_span_temp.psl"
-PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_MATCH=$PAIR_SORT"_to_query_filter_ID_uniq_on_query_span_temp_match"
-PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_ROW=$PAIR_SORT"_to_query_filter_ID_uniq_on_query_span_temp_row"
-PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_PSL_UP=$PAIR_SORT"_to_query_filter_ID_uniq_on_query_span_temp_up.psl"
 
 echo "pre-process scenario A"
 echo `date`
@@ -124,8 +120,10 @@ fi
 #blat on query again for unique ID: (each ID can have one or two output, one means spanning, two means splitting)
 if [ -s $PAIR_TO_QUERY_FILTER_ID_UNIQ_FA ];
         then
-                echo "blat on query again in QF_pair_A.sh"
-                blat -stepSize=$size_query -repMatch=$rep_match -minIdentity=$Align_percent $QUERY_FA $PAIR_TO_QUERY_FILTER_ID_UNIQ_FA $PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL
+                echo "blat on query again in QF_pair_A.sh with header in"
+                #blat -stepSize=$size_query -repMatch=$rep_match -minIdentity=$Align_percent $QUERY_FA $PAIR_TO_QUERY_FILTER_ID_UNIQ_FA $PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL
+                python $QF_path"/local_aligner_wrapper_blat.py" -i $PAIR_TO_QUERY_FILTER_ID_UNIQ_FA -r $QUERY_FA -s $size_query -a $Align_percent -o $PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL -l $READ_LEN -H TRUE -m $MIN_SCORE
+
         else
                 echo "Warning: "$PAIR_TO_QUERY_FILTER_ID_UNIQ_FA" is not generated in QF_pair_A.sh, exit"
                 echo "Warning: "$PAIR_TO_QUERY_FILTER_ID_UNIQ_FA" is not generated in QF_pair_A.sh, exit" >> $LOG_ERROR
@@ -147,9 +145,9 @@ echo "===================="
 #echo "Perl_script"$Perl_script
 #echo "Python_script"$Python_script
 #echo "Align_percent"$Align_percent
-$QF_path"QF_pair_A1.sh" $file_prefix $bam_fd $outresult_fd $GENE_BED $HG_FA $READ_LEN $LOG_ERROR $QF_path $Align_percent
+$QF_path"QF_pair_A1.sh" $file_prefix $bam_fd $outresult_fd $GENE_BED $HG_FA $READ_LEN $LOG_ERROR $QF_path $Align_percent $MIN_SCORE
 
 #echo $GENOME_REF
-$QF_path"QF_pair_A2.sh" $file_prefix $READ_LEN $QUERY_FA $GENE_BED $GENOME_REF $LOG_ERROR $QF_path $size_query
+$QF_path"QF_pair_A2.sh" $file_prefix $READ_LEN $QUERY_FA $GENE_BED $GENOME_REF $LOG_ERROR $QF_path $size_query $Align_percent $MIN_SCORE
 echo "finished processing of pair scenario a2"
 echo "===================="

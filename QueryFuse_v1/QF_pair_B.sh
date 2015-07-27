@@ -16,10 +16,10 @@
 
 #Gene_specific_fusion_query subfunction: pocessing pair scenario B (pre-process, b1, b2)
 #GSFQ_pair_B.sh
-if [ $# -ne 11 ]
+if [ $# -ne 12 ]
 then
   echo ""
-    echo "Usage: QF_pair_B.sh File_prefix BAM_file_folder_prefix result_folder_prefix whole_gene_list.bed human_genome.fa read_length tophat_genome_reference LOG_ERROR QF_path Align_percent size_query "
+    echo "Usage: QF_pair_B.sh File_prefix BAM_file_folder_prefix result_folder_prefix whole_gene_list.bed human_genome.fa read_length tophat_genome_reference LOG_ERROR QF_path Align_percent size_query MIN_SCORE"
     echo ""
     echo "File_prefix - The folder that all the defualt can use (for intermedia files)."
     echo "BAM_file_folder_prefix - that has all three needed input bam files."
@@ -32,6 +32,7 @@ then
     echo "QueryFuse_path - QueryFuse path."
     echo "Align_percent"
     echo "size_query - step_size for blat to query"
+    echo "minscore parameter for blat (which will define the min alignment length allowed)"
     echo ""
     exit 1
 fi
@@ -78,7 +79,8 @@ LOG_ERROR=$8
 QF_path=${9}
 Align_percent=${10}
 size_query=${11}
-rep_match=$((1024*11/size_query))
+MIN_SCORE=${12}
+#rep_match=$((1024*11/size_query))
 
 
 #Build the name for files
@@ -98,8 +100,6 @@ PAIR_TO_QUERY_FILTER_BED=$PAIR_SORT"_to_query_filter.bed"
 PAIR_TO_QUERY_FILTER_ID_DUPLI=$PAIR_SORT"_to_query_pair_filter_ID_duplicate.txt"
 PAIR_TO_QUERY_FILTER_ID_DUPLI_FA=$PAIR_SORT"_to_query_pair_filter_ID_duplicate.fa"
 PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_PSL=$PAIR_SORT"_to_query_pair_filter_ID_duplicate_on_query.psl"
-PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID=$PAIR_SORT"_to_query_pair_filter_ID_duplicate_on_query_split_ID.txt"
-PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_PSL=$PAIR_SORT"_to_query_pair_filter_ID_duplicate_on_query_split_ID.psl"
 
 echo "pre-process scenario B in QF_pair_B.sh"
 
@@ -139,7 +139,9 @@ if [ -s $QUERY_FA -a -s $PAIR_TO_QUERY_FILTER_ID_DUPLI_FA ];
 	then
 		echo `date`
 		echo "blat the duplicate to query in QF_pair_B.sh"		
-		blat -stepSize=$size_query -repMatch=$rep_match -minIdentity=$Align_percent $QUERY_FA $PAIR_TO_QUERY_FILTER_ID_DUPLI_FA $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_PSL
+		#blat -stepSize=$size_query -repMatch=$rep_match -minIdentity=$Align_percent $QUERY_FA $PAIR_TO_QUERY_FILTER_ID_DUPLI_FA $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_PSL
+                python $QF_path"/local_aligner_wrapper_blat.py" -i $PAIR_TO_QUERY_FILTER_ID_DUPLI_FA -r $QUERY_FA -s $size_query -a $Align_percent -o $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_PSL -l $READ_LEN -H TRUE -m $MIN_SCORE
+
 	else
 		echo "Warning: "$PAIR_TO_QUERY_FILTER_ID_DUPLI_FA" is not exsit in QF_pair_B.sh, exit"
 		echo "Warning: "$PAIR_TO_QUERY_FILTER_ID_DUPLI_FA" is not exsit in QF_pair_B.sh, exit"  >> $LOG_ERROR
@@ -148,7 +150,7 @@ fi
 
 echo "finished pre-processing of pair scenario b"
 echo "===================="
-$QF_path"QF_pair_B2.sh" $file_prefix $bam_fd $outresult_fd $GENE_BED $HG_FA $READ_LEN $LOG_ERROR $QF_path $Align_percent
+$QF_path"QF_pair_B2.sh" $file_prefix $bam_fd $outresult_fd $GENE_BED $HG_FA $READ_LEN $LOG_ERROR $QF_path $Align_percent $MIN_SCORE
 
 
-$QF_path"QF_pair_B1.sh" $file_prefix $READ_LEN $QUERY_FA $GENE_BED $GENOME_REF $LOG_ERROR $QF_path $size_query
+$QF_path"QF_pair_B1.sh" $file_prefix $READ_LEN $QUERY_FA $GENE_BED $GENOME_REF $LOG_ERROR $QF_path $size_query $MIN_SCORE
