@@ -16,10 +16,10 @@
 
 #Gene_specific_fusion_query subfunction: pocessing pair scenario B1
 #GSFQ_pair_B1.sh
-if [ $# -ne 8 ]
+if [ $# -ne 9 ]
 then
   echo ""
-    echo "Usage: QF_pair_B1.sh file_prefix READ_LEN QUERY_FA whole_gene_list.bed tophat_genome_reference LOG_ERROR QueryFuse_path size_query"
+    echo "Usage: QF_pair_B1.sh file_prefix READ_LEN QUERY_FA whole_gene_list.bed tophat_genome_reference LOG_ERROR QueryFuse_path size_query minscore"
     echo ""
     echo "file_prefix -  The folder that all the defualt can use (for intermedia files)."
     echo "READ_LEN - the length of reads"
@@ -29,6 +29,7 @@ then
     echo "LOG_ERROR - path to the error log file"
     echo "QueryFuse_path - QueryFuse path."
     echo "size_query - step_size for blat to query"
+    echo "minscore parameter for blat (which will define the min alignment length allowed)"
     echo ""
     exit 1
 fi
@@ -43,6 +44,7 @@ QUERY_FA=$3
 LOG_ERROR=$6
 QF_path=$7
 size_query=${8}
+MIN_SCORE=${9}
 
 PAIR_SORT=$file_prefix"paired_sorted"
 PAIR_TO_QUERY_BAM=$PAIR_SORT"_to_query.bam"
@@ -77,7 +79,7 @@ fi
 echo "finished pre-processing of pair scenario b1 in QF_pair_B1.sh"
 echo "===================="
 #echo $PAIR_TO_QUERY_FILTER_ID_DUPLI_FA
-$QF_path"QF_pair_unreliable_split.sh" $file_prefix $READ_LEN $QUERY_FA $GENE_BED $GENOME_REF $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPAN_ID_PSL $PAIR_TO_QUERY_FILTER_ID_DUPLI_FA $QF_path $LOG_ERROR $size_query
+$QF_path"QF_pair_unreliable_split.sh" $file_prefix $READ_LEN $QUERY_FA $GENE_BED $GENOME_REF $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPAN_ID_PSL $PAIR_TO_QUERY_FILTER_ID_DUPLI_FA $QF_path $LOG_ERROR $size_query $MIN_SCORE
 
 echo "finished processing pair scenario b1 in QF_pair_B1.sh"
 echo "===================="

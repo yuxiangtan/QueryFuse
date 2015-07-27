@@ -49,6 +49,7 @@ Usage: python QF_pair_end_process.py
 
 -q size_query - the value of blat -stepSize option value for blat to query					    [default value is 5]
 
+-m minscore parameter for blat (which will define the min alignment length allowed)				    [default value is 11]
 
 ============================
 
@@ -109,10 +110,11 @@ if __name__ == "__main__":
 	resume_stat=0
         Align_percent="98"
 	size_query=5
+	MIN_SCORE="11"
      
 	###get arguments(parameters)
 	#all the names of parameters must in the optlist.
-	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:w:g:t:T:F:l:r:R:P:Y:a:b:q:Q:O:S:z')
+	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:w:g:t:T:F:l:r:R:P:Y:a:b:q:Q:O:S:m:z')
         for opt in optlist:
             if opt[0] == '-h':
                 print __doc__; sys.exit(2)
@@ -129,6 +131,7 @@ if __name__ == "__main__":
             elif opt[0] == '-a': Align_percent =opt[1]
             elif opt[0] == '-Q': query_bed =opt[1]
             elif opt[0] == '-q': size_query =int(opt[1])
+	    elif opt[0] == '-m': MIN_SCORE = opt[1]
 	    #because I check in pair end, only blat to query is used.
 	    #elif opt[0] == '-O': blat_other =opt[1]
             
@@ -269,7 +272,7 @@ if __name__ == "__main__":
         log_whole.write(step_name+'\n')
         #next_step_name="Process Pair-align scenario b in QF_pair_end_process.py"
         next_step_name="This is the end for pair_end_process"
-	pairA_cmd=QF_path+"QF_pair_A.sh "+file_prefix+" "+bam_fd+" "+outresult_fd+" "+whole_gene_list+" "+genome_fa+" "+read_len+" "+tophat_genome_ref+" "+LOG_ERR+" "+QF_path+" "+Align_percent+" "+str(size_query)
+	pairA_cmd=QF_path+"QF_pair_A.sh "+file_prefix+" "+bam_fd+" "+outresult_fd+" "+whole_gene_list+" "+genome_fa+" "+read_len+" "+tophat_genome_ref+" "+LOG_ERR+" "+QF_path+" "+Align_percent+" "+str(size_query)+" "+MIN_SCORE
         pairA_cmd_status=QF_all_modules.resume_func(pairA_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
 	resume_stat_loc=pairA_cmd_status[0]
         QF_all_modules.optional_step_check(pairA_cmd_status, log_whole, log_error, "processing Pair-align scenario a in QF_pair_end_process.py")
@@ -279,7 +282,7 @@ if __name__ == "__main__":
 #        step_name="Process Pair-align scenario b in QF_pair_end_process.py"
 #        log_whole.write(step_name+'\n')
 #        next_step_name="This is the end for pair_end_process"
-#        pairB_cmd=QF_path+"QF_pair_B.sh "+file_prefix+" "+bam_fd+" "+outresult_fd+" "+whole_gene_list+" "+genome_fa+" "+read_len+" "+tophat_genome_ref+" "+LOG_ERR+" "+QF_path+" "+Align_percent+" "+str(size_query)
+#        pairB_cmd=QF_path+"QF_pair_B.sh "+file_prefix+" "+bam_fd+" "+outresult_fd+" "+whole_gene_list+" "+genome_fa+" "+read_len+" "+tophat_genome_ref+" "+LOG_ERR+" "+QF_path+" "+Align_percent+" "+str(size_query)+" "+MIN_SCORE
 #	pairB_cmd_status=QF_all_modules.resume_func(pairB_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
 #	resume_stat_loc=pairB_cmd_status[0]
 #	QF_all_modules.optional_step_check(pairB_cmd_status, log_whole, log_error, "processing Pair-align scenario b in QF_pair_end_process.py")

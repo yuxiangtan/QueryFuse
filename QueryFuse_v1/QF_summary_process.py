@@ -57,6 +57,7 @@ Usage: python QF_summary_process.py
 
 -u number of sum of supporting reads										    [default value 2]
 
+-m minscore parameter for blat (which will define the min alignment length allowed)				    [default value is 11]
 
 ============================
 
@@ -123,10 +124,11 @@ if __name__ == "__main__":
 	filter_num="2"
 	size_query="5"
 	size_other="11"
+	MIN_SCORE="11"
 	
 	###get arguments(parameters)
 	#all the names of parameters must in the optlist.
-	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:w:g:t:T:F:f:l:r:R:P:Y:a:b:Q:S:s:L:N:u:f:U:O:z')
+	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:w:g:t:T:F:f:l:r:R:P:Y:a:b:Q:S:s:L:N:u:f:U:O:m:z')
         for opt in optlist:
             if opt[0] == '-h':
                 print __doc__; sys.exit(2)
@@ -149,7 +151,7 @@ if __name__ == "__main__":
 	    elif opt[0] == '-f': filter_num = opt[1]
 	    elif opt[0] == '-U': size_query =int(opt[1])
 	    elif opt[0] == '-O': size_other =int(opt[1])
-	      
+	    elif opt[0] == '-m': MIN_SCORE = opt[1]  
    
         if LOG_F==None:
             print "Warning: LOG_F is not provided in QF_summary_process.py, exit."; sys.exit(2)
@@ -407,7 +409,7 @@ if __name__ == "__main__":
 	step_name="Breakpoint correction for merged events and shift range  in QF_summary_process.py"
         log_whole.write(step_name+'\n')
         next_step_name="Group the spanning reads by using the existing breakpoints defined by splitting reads in QF_summary_process.py"
-        bp_correct_cmd="python "+QF_path+"/breakpoint_adjustment_shift_range_scorening.py -o "+FUSION_BREAK_POINT_SUM_COUNT_MERGE_REF_FILT_ADJ+" -O "+SUBGRAPH_FOLDER+" -w "+whole_gene_list+" -g "+LOG_ERR+" -t "+ALL_REF_TEMP_FA+" -T "+genome_fa+" -F "+QF_path+" -a "+str(Align_percent)+" -Q "+query_bed+" -q "+QUERY_FA+" -i "+str(size_query)+" -I "+str(size_other)+" -l "+str(read_len)+" -f "+file_prefix
+        bp_correct_cmd="python "+QF_path+"/breakpoint_adjustment_shift_range_scorening.py -o "+FUSION_BREAK_POINT_SUM_COUNT_MERGE_REF_FILT_ADJ+" -O "+SUBGRAPH_FOLDER+" -w "+whole_gene_list+" -g "+LOG_ERR+" -t "+ALL_REF_TEMP_FA+" -T "+genome_fa+" -F "+QF_path+" -a "+str(Align_percent)+" -Q "+query_bed+" -q "+QUERY_FA+" -i "+str(size_query)+" -I "+str(size_other)+" -l "+str(read_len)+" -f "+file_prefix+" -m "+MIN_SCORE
 	bp_correct_cmd_status=QF_all_modules.resume_func(bp_correct_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
 	resume_stat_loc=bp_correct_cmd_status[0]
         QF_all_modules.key_step_check(bp_correct_cmd_status, step_name, log_whole, log_error)

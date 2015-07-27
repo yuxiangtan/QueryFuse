@@ -292,7 +292,7 @@ def cmd_paired_end_for_query(param,query):
     QUERY_BED=result_outdir+"query_gene.bed"
     QUERY_FA=result_outdir+"query_gene.fa"    
     
-    QF_pair_end_process_cmd="python "+param["QF_path"]+"QF_pair_end_process.py"+" -i "+inter_outdir+" -B "+param["bam_dir"]+" -o "+result_outdir+" -w "+param["whole_gene_list"]+" -g "+log_outdir_paired_end+" -t "+param["tophat_genome_ref"]+" -T "+param["genome_fa"]+" -F "+param["QF_path"]+" -l "+str(param["read_len"])+" -r "+str(param["resume_stat"])+" -a "+str(param["Align_percent"])+" -Q "+QUERY_BED+" -q "+param["step_size_query"]
+    QF_pair_end_process_cmd="python "+param["QF_path"]+"QF_pair_end_process.py"+" -i "+inter_outdir+" -B "+param["bam_dir"]+" -o "+result_outdir+" -w "+param["whole_gene_list"]+" -g "+log_outdir_paired_end+" -t "+param["tophat_genome_ref"]+" -T "+param["genome_fa"]+" -F "+param["QF_path"]+" -l "+str(param["read_len"])+" -r "+str(param["resume_stat"])+" -a "+str(param["Align_percent"])+" -Q "+QUERY_BED+" -q "+param["step_size_query"]+" -m "+param["min_score"]
     #print QF_pair_end_process_cmd
     return(QF_pair_end_process_cmd)
 
@@ -310,7 +310,7 @@ def cmd_single_end_for_query(param,query):
     QUERY_BED=result_outdir+"query_gene.bed"
     QUERY_FA=result_outdir+"query_gene.fa"
     
-    QF_single_end_process_cmd="python "+param["QF_path"]+"QF_single_end_process.py"+" -i "+inter_outdir+" -B "+param["bam_dir"]+" -o "+result_outdir+" -w "+param["whole_gene_list"]+" -g "+log_outdir_single_end+" -t "+param["tophat_genome_ref"]+" -T "+param["genome_fa"]+" -F "+param["QF_path"]+" -l "+str(param["read_len"])+" -r "+str(param["resume_stat"])+" -a "+str(param["Align_percent"])+" -Q "+QUERY_BED+" -U "+param["step_size_query"]+" -O "+param["step_size_other"]+" -q "+query
+    QF_single_end_process_cmd="python "+param["QF_path"]+"QF_single_end_process.py"+" -i "+inter_outdir+" -B "+param["bam_dir"]+" -o "+result_outdir+" -w "+param["whole_gene_list"]+" -g "+log_outdir_single_end+" -t "+param["tophat_genome_ref"]+" -T "+param["genome_fa"]+" -F "+param["QF_path"]+" -l "+str(param["read_len"])+" -r "+str(param["resume_stat"])+" -a "+str(param["Align_percent"])+" -Q "+QUERY_BED+" -U "+param["step_size_query"]+" -O "+param["step_size_other"]+" -q "+query+" -m "+param["min_score"]
     
     #print QF_single_end_process_cmd
     return(QF_single_end_process_cmd)
@@ -405,7 +405,7 @@ def cmd_summary_end_for_query(param,query):
     QUERY_BED=result_outdir+"query_gene.bed"
     QUERY_FA=result_outdir+"query_gene.fa"
     
-    QF_summary_process_cmd="python "+param["QF_path"]+"QF_summary_process.py"+" -i "+inter_outdir+" -B "+param["bam_dir"]+" -o "+result_outdir+" -w "+param["whole_gene_list"]+" -g "+log_outdir_summary+" -t "+param["tophat_genome_ref"]+" -T "+param["genome_fa"]+" -F "+param["QF_path"]+" -l "+str(param["read_len"])+" -r "+str(param["resume_stat"])+" -a "+str(param["Align_percent"])+" -Q "+QUERY_BED+" -s "+str(param["read_std"])+" -L "+str(param["split_n"])+" -N "+str(param["span_n"])+" -u "+str(param["sum_n"])+" -f "+str(param["span_only_filter"])+" -U "+param["step_size_query"]+" -O "+param["step_size_other"]
+    QF_summary_process_cmd="python "+param["QF_path"]+"QF_summary_process.py"+" -i "+inter_outdir+" -B "+param["bam_dir"]+" -o "+result_outdir+" -w "+param["whole_gene_list"]+" -g "+log_outdir_summary+" -t "+param["tophat_genome_ref"]+" -T "+param["genome_fa"]+" -F "+param["QF_path"]+" -l "+str(param["read_len"])+" -r "+str(param["resume_stat"])+" -a "+str(param["Align_percent"])+" -Q "+QUERY_BED+" -s "+str(param["read_std"])+" -L "+str(param["split_n"])+" -N "+str(param["span_n"])+" -u "+str(param["sum_n"])+" -f "+str(param["span_only_filter"])+" -U "+param["step_size_query"]+" -O "+param["step_size_other"]+" -m "+param["min_score"]
     return(QF_summary_process_cmd)
         
 # Queue up a job, and immediately stop and wait for its results

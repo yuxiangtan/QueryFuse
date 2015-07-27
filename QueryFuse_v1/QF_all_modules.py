@@ -132,6 +132,9 @@ def initialize_standard(param):
          os.makedirs(param['working_dir']+'bams/')
     if not os.path.exists(param['working_dir']+'intermedias/'):
          os.makedirs(param['working_dir']+'intermedias/')
+	 
+    #hard code min_score here
+    param["min_score"]="11"
 
 def write_updated_file(updated, param, parameter_file):
     new_parameter_file=param['working_dir']+'results/'+parameter_file[:-4]+'_used.txt'

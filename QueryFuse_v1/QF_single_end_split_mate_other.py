@@ -32,13 +32,13 @@ Usage: python QF_single_end_split_mate_other.py
 
 -Q to_other_only_ID(from the other mate) - location of the to_other_only_ID.txt(should use from the other mate)	    [default value: file_prefixfolder, singleton_sorted_to_other_only_ID_END_O_mate.txt]
 
--w whole_gene_list.bed				                                                                    *[No default value]
-
 -u Unmap_over_query_split_subtract_BED- Bed file which contain subtract information for unmap over query of the mate same as the query_split_ID         [default value file_prefixfolder, unmapped.bam_END_N_mate_on_query.psl_split_ID_subtract.bed]
 
 -m mate_fa - fa file of the same mate as the query_split_ID                                                         [default value file_prefixfolder, unmapped.bam_END_N_mate.fa]
 
 -U UNMAP_ON_QUERY_PSL - location of UNMAP_ON_QUERY_PSL                                                              [default value file_prefixfolder, unmapped.bam_END_N_mate_on_query.psl]
+
+-w whole_gene_list.bed				                                                                    *[No default value]
 
 -t tophat_genome_reference_fa - the path of the genome fa file (such as hg19.fa)                                    *[No default value]
 
@@ -55,6 +55,8 @@ Usage: python QF_single_end_split_mate_other.py
 -O size_other - the value of blat -stepSize option value for blat to other					    [default value is 11]
 
 -a Align_percent: min percentage of alignment                                                                       [default value is 98]
+
+-m minscore parameter for blat (which will define the min alignment length allowed)				    [default value is 11]
 
 ============================
 
@@ -101,7 +103,6 @@ if __name__ == "__main__":
         LOG_F=None
         END_N=None
 	QF_path=None
-        
         query_split=None
 	single_to_other=None
 	unmap_sub_bed=None
@@ -112,15 +113,16 @@ if __name__ == "__main__":
         resume_stat=0
         Align_percent=98
 	size_other=11
+	MIN_SCORE="11"
 	
 	###get arguments(parameters)
 	#all the names of parameters must in the optlist.
-	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:w:g:t:E:F:q:Q:u:o:U:s:m:l:r:R:P:Y:a:b:O:S:z')
+	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:w:g:t:E:F:q:Q:u:o:U:s:m:l:r:R:P:Y:a:b:O:S:M:z')
         for opt in optlist:
             if opt[0] == '-h':
                 print __doc__; sys.exit(2)
-            elif opt[0] == '-i': file_prefix = opt[1]
             elif opt[0] == '-w': whole_gene_list = opt[1]
+            elif opt[0] == '-i': file_prefix = opt[1]
             elif opt[0] == '-g': LOG_F = opt[1]
             elif opt[0] == '-t': tophat_genome_fa =opt[1]
             elif opt[0] == '-E': END_N = opt[1]
@@ -135,6 +137,7 @@ if __name__ == "__main__":
             elif opt[0] == '-r': resume_stat = int(opt[1])
             elif opt[0] == '-a': Align_percent =opt[1]
             elif opt[0] == '-O': size_other =int(opt[1])
+	    elif opt[0] == '-M': MIN_SCORE = opt[1]
 	
         if LOG_F==None:
              log_whole.write("Warning: LOG_F is not provided in QF_single_end_split_mate_other.py, exit.\n"); sys.exit(2)
@@ -151,10 +154,6 @@ if __name__ == "__main__":
         if file_prefix==None:
             print "Warning: file_prefix is not provided in QF_single_end_split_mate_other.py, exit."
             log_error.write("Warning: file_prefix is not provided in QF_single_end_split_mate_other.py, exit.\n"); sys.exit(1)
-        
-        if whole_gene_list==None:
-            print "Warning: whole_gene_list is not provided in QF_single_end_split_mate_other.py, exit."
-            log_error.write("Warning: whole_gene_list is not provided in QF_single_end_split_mate_other.py, exit.\n"); sys.exit(1)
         
         if tophat_genome_fa==None:
             print "Warning: tophat_genome_fa is not provided in QF_single_end_split_mate_other.py, exit."
@@ -196,10 +195,6 @@ if __name__ == "__main__":
             single_other_bed=file_prefix+"singleton_sorted_to_other.bed"
 	        
 	#check whether the files provide is there.
-	if not os.path.exists(whole_gene_list):
-	    print "Warning: whole_gene_list:"+whole_gene_list+" is not found in QF_single_end_split_mate_other.py, exit."
-            log_error.write("Warning: whole_gene_list:"+whole_gene_list+" is not found in QF_single_end_split_mate_other.py, exit.\n"); sys.exit(1)
-	
         if not os.path.exists(tophat_genome_fa):
 	    print "Warning: tophat_genome_fa:"+tophat_genome_fa+" is not found in QF_single_end_split_mate_other.py, exit."
             log_error.write("Warning: tophat_genome_fa:"+tophat_genome_fa+" is not found in QF_single_end_split_mate_other.py, exit.\n"); sys.exit(1)
@@ -266,7 +261,8 @@ if __name__ == "__main__":
         step_name="Blat the subtract to their mates of "+END_N+" end in QF_single_end_split_mate_other.py"
         log_whole.write(step_name+'\n')
         next_step_name="pre process the summary of "+END_N+" end in QF_single_end_split_mate_other.py"
-        Blat_sub_cmd=QF_path+"/blat_to_mate_no_grouping.sh "+SINGLE_ON_QUERY_SPLIT_MATE_OTHER_ID+" "+single_other_bed+" "+whole_gene_list+" "+tophat_genome_fa+" "+unmap_sub_bed+" "+mate_fa+" "+SINGLE_ON_QUERY_SPLIT_MATE_OTHER_BLAT_PSL+" "+QF_path+" "+LOG_ERR+" "+str(size_other)+" "+Align_percent
+        Blat_sub_cmd=QF_path+"/blat_to_mate_no_grouping.sh "+SINGLE_ON_QUERY_SPLIT_MATE_OTHER_ID+" "+single_other_bed+" "+whole_gene_list+" "+tophat_genome_fa+" "+unmap_sub_bed+" "+mate_fa+" "+SINGLE_ON_QUERY_SPLIT_MATE_OTHER_BLAT_PSL+" "+QF_path+" "+LOG_ERR+" "+str(size_other)+" "+Align_percent+" "+str(read_len)+" "+MIN_SCORE
+        #Blat_sub_cmd="python "+QF_path+"/blat_to_mate_no_grouping.py -r "+SINGLE_ON_QUERY_SPLIT_MATE_OTHER_ID+" -M "+single_other_bed+" -B "+unmap_sub_bed+" -F "+tophat_genome_fa+" -f "+mate_fa+" -o "+SINGLE_ON_QUERY_SPLIT_MATE_OTHER_BLAT_PSL+" -Q "+QF_path+" -g "+LOG_ERR+" -s "+str(size_other)+" -a "+Align_percent+" -c FALSE -R "+str(read_len)
         if os.stat(SINGLE_ON_QUERY_SPLIT_MATE_OTHER_ID).st_size == 0:
             log_whole.write(SINGLE_ON_QUERY_SPLIT_MATE_OTHER_ID+" is empty "+END_N+" end in QF_single_end_split_mate_other.py, exit.\n")
             log_error.write(SINGLE_ON_QUERY_SPLIT_MATE_OTHER_ID+" is empty "+END_N+" end in QF_single_end_split_mate_other.py, exit.\n"); sys.exit(1)
