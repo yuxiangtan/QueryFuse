@@ -16,10 +16,10 @@
 
 #Gene_specific_fusion_query subfunction: pocessing unreliable split reads (A2 and B1)
 #GSFQ_pair_unreliable_split.sh
-if [ $# -ne 10 ];
+if [ $# -ne 12 ];
 then
   echo ""
-    echo "Usage: QF_pair_unreliable_split.sh file_prefix READ_LEN QUERY_FA whole_gene_list.bed tophat_genome_reference QUERY_SPLIT_PSL QUERY_SPLIT_CANDIDATE_ID QUERY_FILTER_ID_FA QF_path LOG_ERROR size_query"
+    echo "Usage: QF_pair_unreliable_split.sh file_prefix READ_LEN QUERY_FA whole_gene_list.bed tophat_genome_reference QUERY_SPLIT_PSL QUERY_SPLIT_CANDIDATE_ID QUERY_FILTER_ID_FA QF_path LOG_ERROR size_query Align_percent MIN_SCORE"
     echo ""
     echo "file_prefix -  The folder that all the defualt can use (for intermedia files)."
     echo "READ_LEN - the length of reads"
@@ -31,6 +31,8 @@ then
     echo "QF_path"
     echo "LOG_ERROR"
     echo "size_query - step_size for blat to query"
+    echo "Align_percent"
+    echo "minscore parameter for blat (which will define the min alignment length allowed)"
     echo ""
 	exit 1
 fi
@@ -45,7 +47,9 @@ QUERY_FILTER_ID_FA=$7
 QF_path=${8}
 LOG_ERROR=${9}
 size_query=${10}
-rep_match=$((1024*11/size_query))
+Align_percent=${11}
+MIN_SCORE=${12}
+#rep_match=$((1024*11/size_query))
 
 PAIR_SORT=$file_prefix"paired_sorted"
 PAIR_TO_QUERY_BAM=$PAIR_SORT"_to_query.bam"
@@ -64,7 +68,7 @@ if [ -s $QUERY_SPLIT_PSL ];
                 #echo `date`
                 echo "get split candiates and their seq into fa file in QF_pair_unreliable_split.sh"
                 #in this small script, grep is used, it may make the program slow. 
-                $QF_path"psl_to_ID_extract_split_major_on_query.sh" $QUERY_SPLIT_PSL $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_CANDIDATE_ID $QUERY_FILTER_ID_FA $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_FA $READ_LEN
+                $QF_path"psl_to_ID_extract_split_major_on_query.sh" $QUERY_SPLIT_PSL $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_CANDIDATE_ID $QUERY_FILTER_ID_FA $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_FA $READ_LEN $MIN_SCORE
         else
                 echo "Warning: "$QUERY_SPLIT_PSL" is not exist in QF_pair_unreliable_split.sh, exit"
                 echo "Warning: "$QUERY_SPLIT_PSL" is not exist in QF_pair_unreliable_split.sh, exit" >> $LOG_ERROR
@@ -76,7 +80,9 @@ if [ -s $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_FA ];
         then
                 echo `date`
                 echo 'Blat to get splitting end from candidates in QF_pair_unreliable_split.sh'
-                blat -stepSize=$size_query -repMatch=$rep_match -noHead $QUERY_FA $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_FA $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_PSL
+                #blat -stepSize=$size_query -repMatch=$rep_match -noHead $QUERY_FA $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_FA $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_PSL
+                python $QF_path"/local_aligner_wrapper_blat.py" -i $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_FA -r $QUERY_FA -s $size_query -a $Align_percent -o $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_PSL -l $READ_LEN -m $MIN_SCORE
+
                 echo `date`
                 echo 'Blat finished in QF_pair_unreliable_split.sh'
                 
@@ -113,7 +119,7 @@ fi
 if [ -s $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_PSL ]
 	then
             cut -f1 $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_PSL > $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_MATCH
-            Rscript $QF_path"boundary_row_ID.R" file.in=$PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_MATCH lower_bound=0 upper_bound=$[READ_LEN-23] file.out=$PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_ROW
+            Rscript $QF_path"boundary_row_ID.R" file.in=$PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_MATCH lower_bound=0 upper_bound=$[READ_LEN-MIN_SCORE] file.out=$PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_ROW
             UP_ROW_SPLIT=`sed '2p' -n $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_ROW`
             ROW_NUM_SPLIT=`wc -l $PAIR_TO_QUERY_FILTER_ID_ON_QUERY_SPLIT_ID_TEMP_MATCH | cut -d' ' -f1`
 	
