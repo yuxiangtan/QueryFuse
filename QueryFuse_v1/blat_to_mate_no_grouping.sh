@@ -22,10 +22,10 @@
 #blat the subtract to the gene
 
 
-if [ $# -ne 11 ]
+if [ $# -ne 13 ]
 then
   echo ""
-    echo "Warning: Usage: blat_to_mate_no_grouping.sh read_list mate_bed whole_gene_list.bed reference.fa subtract.bed target_reads.fa output_file Script_path LOG_ERR size_other Align_percent"
+    echo "Warning: Usage: blat_to_mate_no_grouping.sh read_list mate_bed whole_gene_list.bed reference.fa subtract.bed target_reads.fa output_file Script_path LOG_ERR size_other Align_percent read_len MIN_SCORE"
     echo ""
     echo "Read_list - A file with one read ID each line."
     echo "mate_bed - A bed file of mate alignment."
@@ -38,6 +38,8 @@ then
     echo "LOG_ERR"
     echo "blat step_size to other genes"
     echo "Align_percent"
+    echo "read_len"
+    echo "minscore parameter for blat (which will define the min alignment length allowed)"
   echo ""
 
   exit 1
@@ -137,6 +139,8 @@ Script_path=$8
 LOG_ERR=${9}
 size_other=${10}
 Align_percent=${11}
+read_len=${12}
+MIN_SCORE=${13}
 TEMP_BED=`TEMP_GEN $READ_LIST "_"`
 TEMP_BED1=`TEMP_GEN $READ_LIST "TEMP1"`
 TEMP_BED_NAME=`TEMP_GEN $READ_LIST "TEMP_BED_NAME"`
@@ -244,8 +248,8 @@ fi
 echo `date`
 echo "blat to mate fa in blat_to_mate_no_grouping.sh"
 echo "blat -stepSize=$size_other -repMatch=$rep_match"
-blat -stepSize=$size_other -repMatch=$rep_match -minIdentity=$Align_percent -noHead $TEMP_GENE_FA $TEMP_SUBTRACT_FA $outputfile
-
+#blat -stepSize=$size_other -repMatch=$rep_match -minIdentity=$Align_percent -noHead $TEMP_GENE_FA $TEMP_SUBTRACT_FA $outputfile
+python $Script_path"/local_aligner_wrapper_blat.py" -i $TEMP_SUBTRACT_FA -r $TEMP_GENE_FA -s $size_other -a $Align_percent -o $outputfile -l $read_len -m $MIN_SCORE
 rm $TEMP_BED
 rm $TEMP_BED1
 rm $TEMP_BED_NAME
