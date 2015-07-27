@@ -16,10 +16,10 @@
 
 #Gene_specific_fusion_query subfunction: pocessing pair scenario A1 (pre-process, a1.1, a1.2)
 #GSFQ_pair_A1.sh
-if [ $# -ne 9 ]
+if [ $# -ne 10 ]
 then
   echo ""
-    echo "Usage: QF_pair_A1.sh File_prefix BAM_file_folder_prefix result_folder_prefix whole_gene_list.bed human_genome.fa read_length LOG_ERROR QueryFuse_path Align_percent"
+    echo "Usage: QF_pair_A1.sh File_prefix BAM_file_folder_prefix result_folder_prefix whole_gene_list.bed human_genome.fa read_length LOG_ERROR QueryFuse_path Align_percent MIN_SCORE"
     echo ""
     echo "File_prefix - The folder that all the defualt can use (for intermedia files)."
     echo "BAM_file_folder_prefix - that has all three needed input bam files."
@@ -29,7 +29,8 @@ then
     echo "read_length - length of reads"
     echo "LOG_ERROR - path to the error log file"
     echo "QueryFuse_path - QueryFuse path."
-    echo "Align_percent"    
+    echo "Align_percent"
+    echo "MIN_SCORE min_alignment length"
 		echo ""
                 exit 1
 fi
@@ -74,7 +75,7 @@ READ_LEN=$6
 LOG_ERROR=${7}
 QF_path=${8}
 Align_percent=${9}
-
+MIN_SCORE=${10}
 
 PAIR_BAM=$bam_fd"paired.bam"
 PAIR_SORT=$file_prefix"paired_sorted"
@@ -127,7 +128,7 @@ if [ -s $PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_PSL ];
 	then
 		#echo "check row boundary in QF_pair_A1.sh"
                 cut -f1 $PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_PSL > $PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_MATCH
-                Rscript $QF_path"boundary_row_ID.R" file.in=$PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_MATCH lower_bound=0 upper_bound=$[READ_LEN-23] file.out=$PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_ROW
+                Rscript $QF_path"boundary_row_ID.R" file.in=$PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_MATCH lower_bound=0 upper_bound=$[READ_LEN-MIN_SCORE] file.out=$PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_ROW
                 UP_ROW=`sed '2p' -n $PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_ROW`
                 ROW_NUM=`wc -l $PAIR_TO_QUERY_FILTER_ID_UNIQ_ON_QUERY_PSL_SPAN_TEMP_MATCH | cut -d' ' -f1`
                 #echo "the upper boundary is "$UP_ROW" should be same as the next number"

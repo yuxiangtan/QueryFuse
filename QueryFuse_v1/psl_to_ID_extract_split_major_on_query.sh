@@ -19,10 +19,10 @@
 #should be read pair both aligned to query. One is fully(>90%) aligned and the other is partially(<len-23) aligned.  
 #maybe not in the efficient enough way, but generally should have not that many candidates.
 
-if [ $# -ne 5 ]
+if [ $# -ne 6 ]
 then
   echo ""
-    echo "Usage: psl_to_ID_extract_split_major_on_query.sh psl_file output_name fa_file out_put_fa_file read_length"
+    echo "Usage: psl_to_ID_extract_split_major_on_query.sh psl_file output_name fa_file out_put_fa_file read_length MIN_SCORE"
   echo ""
 
   exit 1
@@ -64,6 +64,7 @@ fi
 ## Start run for each file
 
 READ_LEN=$5
+MIN_SCORE=${6}
 PRE_ID=""
 MIN_MATCH=0
 MAX_MATCH=0
@@ -77,7 +78,7 @@ do
 	MATCH=$(echo $myfile | cut -d' ' -f1)
 	if [ "$ID"x != "$PRE_ID"x ];
 		then
-			if [ $MAX_MATCH -ge $[READ_LEN *9/10] -a $MIN_MATCH -lt $[READ_LEN -23] ];
+			if [ $MAX_MATCH -ge $[READ_LEN *9/10] -a $MIN_MATCH -lt $[READ_LEN -MIN_SCORE] ];
 				then
 
 			echo -e $PRE_ID >> $2
@@ -103,7 +104,7 @@ do
 	fi
 done < $1 ##very important! the $2 means the input file for the while loop.
 
-if [ $MAX_MATCH -ge $[READ_LEN *9/10] -a $MIN_MATCH -lt $[READ_LEN -23] ];
+if [ $MAX_MATCH -ge $[READ_LEN *9/10] -a $MIN_MATCH -lt $[READ_LEN -MIN_SCORE] ];
 		then
 
 			echo -e $PRE_ID >> $2

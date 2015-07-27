@@ -17,10 +17,10 @@
 
 #Gene_specific_fusion_query subfunction: pocessing pair scenario B2
 #GSFQ_pair_B2.sh
-if [ $# -ne 9 ]
+if [ $# -ne 10 ]
 then
   echo ""
-    echo "Usage: QF_pair_B2.sh File_prefix BAM_file_folder_prefix result_folder_prefix whole_gene_list.bed human_genome.fa read_length LOG_ERROR QueryFuse_path Align_percent"
+    echo "Usage: QF_pair_B2.sh File_prefix BAM_file_folder_prefix result_folder_prefix whole_gene_list.bed human_genome.fa read_length LOG_ERROR QueryFuse_path Align_percent MIN_SCORE"
     echo ""
     echo "File_prefix - The folder that all the defualt can use (for intermedia files)."
     echo "BAM_file_folder_prefix - that has all three needed input bam files."
@@ -30,7 +30,8 @@ then
     echo "read_length - length of reads"
     echo "LOG_ERROR - path to the error log file"
     echo "QueryFuse_path - QueryFuse path."
-    echo "Align_percent"    
+    echo "Align_percent"
+    echo "MIN_SCORE min_alignment length"
 		
     echo ""
     exit 1
@@ -48,7 +49,7 @@ READ_LEN=$6
 LOG_ERROR=${7}
 QF_path=${8}
 Align_percent=${9}
-
+MIN_SCORE=${10}
 
 
 PAIR_BAM=$bam_fd"paired.bam"
@@ -104,7 +105,7 @@ fi
 if [ -s $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_PSL ];
 	then
             cut -f1 $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_PSL > $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_MATCH
-            Rscript $QF_path"boundary_row_ID.R" file.in=$PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_MATCH lower_bound=0 upper_bound=$[READ_LEN-23] file.out=$PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_ROW
+            Rscript $QF_path"boundary_row_ID.R" file.in=$PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_MATCH lower_bound=0 upper_bound=$[READ_LEN-MIN_SCORE] file.out=$PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_ROW
             UP_ROW_DUP_SPLIT=`sed '2p' -n $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_ROW`
             ROW_NUM_DUP_SPLIT=`wc -l $PAIR_TO_QUERY_FILTER_ID_DUPLI_ON_QUERY_SPLIT_ID_TEMP_MATCH | cut -d' ' -f1`
             echo "the upper boundary is "$UP_ROW_DUP_SPLIT" and should be matched by the next number"

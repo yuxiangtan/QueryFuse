@@ -35,7 +35,7 @@ fi
 #if [ ! -f $1 ] 
 #then
 #  echo ""
-#  echo "Warning: The file $1 does not exist in QF_psl_to_unmap_process.sh, exit."
+#  echo "Warning: The file $1 does not exist in QF_single_end_perl_sort.sh, exit."
 #  echo ""
 #  exit 1
 #fi
