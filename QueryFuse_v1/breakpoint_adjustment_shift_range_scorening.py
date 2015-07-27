@@ -38,12 +38,6 @@ Usage: python breakpoint_adjustment_shift_range_scorening.py
 
 -a Align_percent: min percentage of alignment                                                                   [default value is 98]
 
--R Rscript path 												[default value is Rscript]
-
--b blat_path - if given, must has "/" at the end                                                                [default value is empty]
-
--S SCC modules                                                                                                  [default value is 0, means not SCC]
-
 -Q query_gene.bed file												*[No default value]
 
 -q query_gene.fa file												*[No default value]
@@ -52,6 +46,7 @@ Usage: python breakpoint_adjustment_shift_range_scorening.py
 
 -I size step para for blat on other										[default value 11]
 
+-m minscore parameter for blat (which will define the min alignment length allowed)				[default value is 11]
 
 ============================
 
@@ -129,7 +124,6 @@ if __name__ == "__main__":
     whole_gene_list=None
     genome_fa=None
     QUERY_FA=None
-    blat_path=""
     ref_template=None
     query_bed=None
     QF_path=None
@@ -137,15 +131,15 @@ if __name__ == "__main__":
     LOG_ERR=None
     R_script="Rscript"
     
-    SCC="0"
     size_query=5
     size_other=11
     Align_percent=98
     read_len=99
+    MIN_SCORE="11"
     
     ###get arguments(parameters)
     #all the names of parameters must in the optlist.
-    optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:O:w:g:t:T:F:f:l:r:R:P:Y:a:b:Q:S:d:k:i:I:q:z')
+    optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:O:w:g:t:T:F:f:l:r:R:P:Y:a:b:Q:S:d:k:i:I:q:m:z')
     for opt in optlist:
 	if opt[0] == '-h':
 	    print __doc__; sys.exit(2)
@@ -160,18 +154,18 @@ if __name__ == "__main__":
 	elif opt[0] == '-F': QF_path = opt[1]
 	elif opt[0] == '-l': read_len = int(opt[1])
 	#elif opt[0] == '-r': resume_stat = int(opt[1])
-	elif opt[0] == '-R': R_script =opt[1]
+	#elif opt[0] == '-R': R_script =opt[1]
 	##elif opt[0] == '-P': Perl_path =opt[1]
 	#elif opt[0] == '-Y': Python_path =opt[1]
 	elif opt[0] == '-a': Align_percent =int(opt[1])
-	elif opt[0] == '-b': blat_path =opt[1]
+	#elif opt[0] == '-b': blat_path =opt[1]
 	elif opt[0] == '-Q': query_bed =opt[1]
-	elif opt[0] == '-S': SCC =opt[1]
 	#elif opt[0] == '-d': data_seq =opt[1]
 	#elif opt[0] == '-k': old_fusion_key = opt[1]
 	elif opt[0] == '-i': size_query = int(opt[1])
 	elif opt[0] == '-I': size_other =int(opt[1])
 	elif opt[0] == '-q': QUERY_FA = opt[1]
+	elif opt[0] == '-m': MIN_SCORE = opt[1]
 
     #for parameter input needed.
     if whole_gene_list==None:
@@ -251,8 +245,6 @@ if __name__ == "__main__":
     #this should be in another file and step.
     repMatch_query=int(round(float(1024*11)/size_query))
     repMatch_other=int(round(float(1024*11)/size_other))
-
-    blat_script=blat_path+"blat"
     
     UNMAP_1_ON_QUERY_SPLIT_MATE_OTHER_ID=file_prefix+"/unmapped.bam_first_mate_on_query.psl_split_ID_subtract_ID.txt_split_mate_to_other_ID.txt"
     UNMAP_2_ON_QUERY_SPLIT_MATE_OTHER_ID=file_prefix+"/unmapped.bam_second_mate_on_query.psl_split_ID_subtract_ID.txt_split_mate_to_other_ID.txt"
@@ -340,21 +332,18 @@ if __name__ == "__main__":
     cmd2="fastaFromBed -fi "+genome_fa+" -bed "+whole_gene_list_split_query_filter+" -fo "+genome_split_fa+" -name"
     
     #Adjust the align_percent to match the min match requirement for min length alignment.
-    min_len=25
+    min_len=int(MIN_SCORE)
     mismatch_num=read_len*(100-Align_percent)/100
     new_align_percent=(100*min_len-100*mismatch_num)/min_len
-    cmd3=blat_script+" -noHead -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(new_align_percent)+" "+QUERY_FA+" "+ref_template+" "+ref_template+"query.psl"
+    #cmd3=blat_script+" -noHead -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(new_align_percent)+" "+QUERY_FA+" "+ref_template+" "+ref_template+"query.psl"
+    cmd3="python "+QF_path+"/local_aligner_wrapper_blat.py -i "+ref_template+" -r "+QUERY_FA+" -s "+str(size_query)+" -a "+str(new_align_percent)+" -o "+ref_template+"query.psl"+" -l "+str(read_len)+" -m "+MIN_SCORE
+    #cmd4=blat_script+" -noHead -stepSize="+str(size_other)+" -repMatch="+str(repMatch_other)+" -minIdentity="+str(new_align_percent)+" "+genome_split_fa+" "+ref_template+" "+ref_template+"other.psl"
+    cmd4="python "+QF_path+"/local_aligner_wrapper_blat.py -i "+ref_template+" -r "+genome_split_fa+" -s "+str(size_query)+" -a "+str(new_align_percent)+" -o "+ref_template+"other.psl"+" -l "+str(read_len)+" -m "+MIN_SCORE
     
-    cmd4=blat_script+" -noHead -stepSize="+str(size_other)+" -repMatch="+str(repMatch_other)+" -minIdentity="+str(new_align_percent)+" "+genome_split_fa+" "+ref_template+" "+ref_template+"other.psl"
-    
-    if SCC=="0":
-        subprocess.call(cmd1, shell = True)
-	subprocess.call(cmd2, shell = True)
-	subprocess.call(cmd3, shell = True)
-	subprocess.call(cmd4, shell = True)
-    else:
-        cmd_all=SCC+"; "+cmd1+";"+cmd2+";"+cmd3+";"+cmd4+";"
-	subprocess.call(cmd_all, shell = True)
+    subprocess.call(cmd1, shell = True)
+    subprocess.call(cmd2, shell = True)
+    subprocess.call(cmd3, shell = True)
+    subprocess.call(cmd4, shell = True)
         
     
     #based on the two blat output, need to check the alignment.
@@ -540,7 +529,7 @@ if __name__ == "__main__":
 		    print("Warning: the annotation of two files are not matched, exit")
 		    sys.exit(3)
 		fusion_score=other_score_dic[fusion_key]
-		if fusion_score>(read_len_o-23):
+		if fusion_score>(read_len_o-int(MIN_SCORE)):
 		    h_out_filter.write(fusion_key+" can align well on the fusion partner gene. It is more likely to be a false positive, skip.\n")
 		    continue
 		
@@ -557,7 +546,7 @@ if __name__ == "__main__":
 			fusion_o_bp=int(other_best[fusion_key][sub_key_o][16])
 		    fusion_o_chr_g=GENE_ANNO[other_best[fusion_key][sub_key_o][13]][0]
 		    fusion_o_bp_g=int(fusion_o_bp)+int(GENE_ANNO[other_best[fusion_key][sub_key_o][13]][1])
-		    if fusion_o_len>(read_len_o-23):
+		    if fusion_o_len>(read_len_o-int(MIN_SCORE)):
 			h_out_filter.write(fusion_key+" with bp end in "+other_best[fusion_key][sub_key_o][13]+" at "+fusion_o_chr_g+" "+str(fusion_o_bp_g)+" can align long enough on the fusion partner gene. It is more likely to be a false positive, skip.\n")
 			continue
 		    if fusion_o_len-fusion_score>15:
