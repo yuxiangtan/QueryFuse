@@ -65,6 +65,7 @@ Usage: python QF_single_end_process.py
 
 -q query_ID													    *[No default value]
 
+-m minscore parameter for blat (which will define the min alignment length allowed)				    [default value is 11]
 ============================
 
 Python & Module requirement:
@@ -142,10 +143,11 @@ if __name__ == "__main__":
         Align_percent=98
         size_query=5
 	size_other=11
+	MIN_SCORE="11"
      
 	###get arguments(parameters)
 	#all the names of parameters must in the optlist.
-	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:w:g:t:T:F:l:r:R:P:Y:a:b:U:O:Q:q:S:z')
+	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:w:g:t:T:F:l:r:R:P:Y:a:b:U:O:Q:q:S:m:z')
         for opt in optlist:
             if opt[0] == '-h':
                 print __doc__; sys.exit(2)
@@ -164,7 +166,7 @@ if __name__ == "__main__":
 	    elif opt[0] == '-O': size_other =int(opt[1])
             elif opt[0] == '-Q': query_bed =opt[1]
             elif opt[0] == '-q': query_ID =opt[1]
-            
+            elif opt[0] == '-m': MIN_SCORE = opt[1]
    
    
         if LOG_F==None:
@@ -299,8 +301,9 @@ if __name__ == "__main__":
         next_step_name="blat query on unmapped second end, in QF_single_end_process.py"
 	#to make sure this can match the alignment percentage requirement for short alignment as short as 25bp.
 	align_mis=int(read_len-round(read_len)*Align_percent/100)
-	spe_Align_percent=int(round(25-align_mis)/25*100)
-        blat_1_cmd="blat -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(spe_Align_percent)+" "+QUERY_FA+" "+UNMAP_1_FA+" "+UNMAP_1_ON_QUERY_PSL
+	spe_Align_percent=int(round(int(MIN_SCORE)-align_mis)/int(MIN_SCORE)*100)
+        #blat_1_cmd="blat -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(spe_Align_percent)+" "+QUERY_FA+" "+UNMAP_1_FA+" "+UNMAP_1_ON_QUERY_PSL
+        blat_1_cmd="python "+QF_path+"/local_aligner_wrapper_blat.py -i "+UNMAP_1_FA+" -r "+QUERY_FA+" -s "+str(size_query)+" -a "+str(spe_Align_percent)+" -o "+UNMAP_1_ON_QUERY_PSL+" -c FALSE -l "+str(read_len)+" -H TRUE -m "+MIN_SCORE
         blat_1_cmd_status=QF_all_modules.resume_func(blat_1_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
         resume_stat_loc=blat_1_cmd_status[0]
 	log_whole.write("blat -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+' is used\n')
@@ -311,8 +314,9 @@ if __name__ == "__main__":
         log_whole.write("===================="+'\n')
         log_whole.write(step_name+'\n')
         next_step_name="Generate more unmapped related files of first end, in QF_single_end_process.py"
-        blat_2_cmd="blat -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(spe_Align_percent)+" "+QUERY_FA+" "+UNMAP_2_FA+" "+UNMAP_2_ON_QUERY_PSL
-        blat_2_cmd_status=QF_all_modules.resume_func(blat_2_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
+        #blat_2_cmd="blat -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(spe_Align_percent)+" "+QUERY_FA+" "+UNMAP_2_FA+" "+UNMAP_2_ON_QUERY_PSL
+        blat_2_cmd="python "+QF_path+"/local_aligner_wrapper_blat.py  -i "+UNMAP_2_FA+" -r "+QUERY_FA+" -s "+str(size_query)+" -a "+str(spe_Align_percent)+" -o "+UNMAP_2_ON_QUERY_PSL+" -c FALSE -l "+str(read_len)+" -H TRUE -m "+MIN_SCORE
+	blat_2_cmd_status=QF_all_modules.resume_func(blat_2_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
         resume_stat_loc=blat_2_cmd_status[0]
 	log_whole.write("blat -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+' is used\n')
 	QF_all_modules.optional_step_check(blat_2_cmd_status, log_whole, log_error, "blatting query on unmapped second end, in QF_single_end_process.py")         
@@ -323,7 +327,8 @@ if __name__ == "__main__":
         log_whole.write("===================="+'\n')
         log_whole.write(step_name+'\n')
         next_step_name="Generate more unmapped related files of second end, in QF_single_end_process.py"
-        psl_to_unmap_1_cmd=QF_path+"QF_psl_to_unmap_process.sh "+UNMAP_1_ON_QUERY_PSL+" "+str(read_len)+" "+QF_path
+        psl_to_unmap_1_cmd=QF_path+"QF_psl_to_unmap_process.sh "+UNMAP_1_ON_QUERY_PSL+" "+str(read_len)+" "+QF_path+" "+MIN_SCORE
+
         psl_to_unmap_1_cmd_status=QF_all_modules.resume_func(psl_to_unmap_1_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
         resume_stat_loc=psl_to_unmap_1_cmd_status[0]
 	QF_all_modules.optional_step_check(psl_to_unmap_1_cmd_status, log_whole, log_error, "Generating more unmapped related files of first end, in QF_single_end_process.py")         
@@ -333,7 +338,8 @@ if __name__ == "__main__":
         log_whole.write("===================="+'\n')
         log_whole.write(step_name+'\n')
         next_step_name="Get singletons aligned to query in QF_single_end_process.py"
-        psl_to_unma_2_cmd=QF_path+"QF_psl_to_unmap_process.sh "+UNMAP_2_ON_QUERY_PSL+" "+str(read_len)+" "+QF_path
+        psl_to_unma_2_cmd=QF_path+"QF_psl_to_unmap_process.sh "+UNMAP_2_ON_QUERY_PSL+" "+str(read_len)+" "+QF_path+" "+MIN_SCORE
+
         psl_to_unma_2_cmd_status=QF_all_modules.resume_func(psl_to_unma_2_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
         resume_stat_loc=psl_to_unma_2_cmd_status[0]
 	QF_all_modules.optional_step_check(psl_to_unma_2_cmd_status, log_whole, log_error, "Generating more unmapped related files of second end, in QF_single_end_process.py")         
@@ -441,7 +447,7 @@ if __name__ == "__main__":
         log_whole.write("===================="+'\n')
         log_whole.write(step_name+'\n')
         next_step_name="process single_end_split_mate_to_other on second mate in QF_single_end_process.py"
-        single_end_split_mate_to_other_1_cmd="python "+QF_path+"/QF_single_end_split_mate_other.py -i "+file_prefix+" -E first -q "+UNMAP_1_ON_QUERY_SPLIT_ID_SUBTRACT_ID+" -Q "+SINGLE_ON_OTHER_ONLY_ID_2+" -u "+UNMAP_1_ON_QUERY_SPLIT_ID_SUBTRACT_BED+" -m "+UNMAP_1_FA+" -U "+UNMAP_1_ON_QUERY_PSL+" -l "+str(read_len)+" -s "+SINGLE_ON_OTHER_BED_SORT+" -w "+whole_gene_list+" -t "+genome_fa+" -g "+LOG_F+" -r "+str(resume_stat)+" -F "+QF_path+" -a "+str(Align_percent)+" -O "+str(size_other)
+        single_end_split_mate_to_other_1_cmd="python "+QF_path+"/QF_single_end_split_mate_other.py -i "+file_prefix+" -E first -q "+UNMAP_1_ON_QUERY_SPLIT_ID_SUBTRACT_ID+" -Q "+SINGLE_ON_OTHER_ONLY_ID_2+" -u "+UNMAP_1_ON_QUERY_SPLIT_ID_SUBTRACT_BED+" -m "+UNMAP_1_FA+" -U "+UNMAP_1_ON_QUERY_PSL+" -l "+str(read_len)+" -s "+SINGLE_ON_OTHER_BED_SORT+" -t "+genome_fa+" -g "+LOG_F+" -r "+str(resume_stat)+" -F "+QF_path+" -a "+str(Align_percent)+" -O "+str(size_other)+" -M "+MIN_SCORE+" -w "+whole_gene_list
         single_end_split_mate_to_other_1_cmd_status=QF_all_modules.resume_func(single_end_split_mate_to_other_1_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
         resume_stat_loc=single_end_split_mate_to_other_1_cmd_status[0]
 	QF_all_modules.optional_step_check(single_end_split_mate_to_other_1_cmd_status, log_whole, log_error, "processing single_end_split_mate_to_other on first mate in QF_single_end_process.py")         
@@ -451,7 +457,7 @@ if __name__ == "__main__":
         log_whole.write("===================="+'\n')
         log_whole.write(step_name+'\n')
         next_step_name="process single_end_split_mate_to_both on first mate in QF_single_end_process.py"
-        single_end_split_mate_to_other_2_cmd="python "+QF_path+"/QF_single_end_split_mate_other.py -i "+file_prefix+" -E second -q "+UNMAP_2_ON_QUERY_SPLIT_ID_SUBTRACT_ID+" -Q "+SINGLE_ON_OTHER_ONLY_ID_1+" -u "+UNMAP_2_ON_QUERY_SPLIT_ID_SUBTRACT_BED+" -m "+UNMAP_2_FA+" -U "+UNMAP_2_ON_QUERY_PSL+" -l "+str(read_len)+" -s "+SINGLE_ON_OTHER_BED_SORT+" -w "+whole_gene_list+" -t "+genome_fa+" -g "+LOG_F+" -r "+str(resume_stat)+" -F "+QF_path+" -a "+str(Align_percent)+" -O "+str(size_other)
+        single_end_split_mate_to_other_2_cmd="python "+QF_path+"/QF_single_end_split_mate_other.py -i "+file_prefix+" -E second -q "+UNMAP_2_ON_QUERY_SPLIT_ID_SUBTRACT_ID+" -Q "+SINGLE_ON_OTHER_ONLY_ID_1+" -u "+UNMAP_2_ON_QUERY_SPLIT_ID_SUBTRACT_BED+" -m "+UNMAP_2_FA+" -U "+UNMAP_2_ON_QUERY_PSL+" -l "+str(read_len)+" -s "+SINGLE_ON_OTHER_BED_SORT+" -t "+genome_fa+" -g "+LOG_F+" -r "+str(resume_stat)+" -F "+QF_path+" -a "+str(Align_percent)+" -O "+str(size_other)+" -M "+MIN_SCORE+" -w "+whole_gene_list
         single_end_split_mate_to_other_2_cmd_status=QF_all_modules.resume_func(single_end_split_mate_to_other_2_cmd, resume_stat_loc, step_name, next_step_name, LOG_OUT)
         resume_stat_loc=single_end_split_mate_to_other_2_cmd_status[0]
 	QF_all_modules.optional_step_check(single_end_split_mate_to_other_2_cmd_status, log_whole, log_error, "processing single_end_split_mate_to_other on second mate in QF_single_end_process.py")         
