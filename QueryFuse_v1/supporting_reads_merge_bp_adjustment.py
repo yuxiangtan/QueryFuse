@@ -35,6 +35,8 @@ Usage: python supporting_reads_merge_bp_adjustment.py
 -Q sub-group reads file												*[No default value]
 
 -F QF_path													*[No default value]
+
+-m minscore parameter for blat (which will define the min alignment length allowed)				[default value is 11]
 ============================
 
 Python & Module requirement:
@@ -77,11 +79,12 @@ if __name__ == "__main__":
 	outsupp_fld=None
 	outgraph_fld=None
 	FUSION_BREAK_POINT_SUM_COUNT_MERGE_REF_FILT=None
+	MIN_SCORE=11
 
 	
 	###get arguments(parameters)
 	#all the names of parameters must in the optlist.
-	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:O:w:g:t:T:F:f:l:r:R:P:Y:a:b:Q:S:d:k:i:I:q:z')
+	optlist, cmd_list = getopt.getopt(sys.argv[1:], 'hi:B:o:O:w:g:t:T:F:f:l:r:R:P:Y:a:b:Q:S:d:k:i:I:q:m:z')
         for opt in optlist:
 		if opt[0] == '-h':
 			print __doc__; sys.exit(2)
@@ -93,6 +96,7 @@ if __name__ == "__main__":
 		elif opt[0] == '-d': data_seq =opt[1]
 		elif opt[0] == '-k': old_fusion_key = opt[1]
 		elif opt[0] == '-q': FUSION_BREAK_POINT_SUM_COUNT_MERGE_REF_FILT = opt[1]
+		elif opt[0] == '-m': MIN_SCORE =int(opt[1])
 
         #for parameter input needed.
 	if old_fusion_key==None:
@@ -135,7 +139,7 @@ if __name__ == "__main__":
 	if not os.path.exists(outgraph_fld):
 		os.mkdir(outgraph_fld)
 
-	#use 46 as seed_len to search for seed. move base by base to search at the beginning.
+	#use MIN_SCORE*2 as seed_len to search for seed. move base by base to search at the beginning.
 	#record all the read where the seed is, this is also how many spaces it should be in front of the read to align to the ref_temp. In this matrix, what reads supporting this template is also recorded.
 	#if all the reads have the same seed (by find function), then find the one have the seed at the most left hand side and the one on the most right hand side, merged 3 part together
 	#meanwhile mark down the maximum number of reads that have the share and the reads did not have the seed.
@@ -143,7 +147,6 @@ if __name__ == "__main__":
 	#if <80% filter this event out and mark template not available!
 	
 	#because the shifting of reads are recorded here, I use it to generate supporting graph.
-	#in order to assign the name well, this is used to generate new adjusted fusion boundary and report by using blat.
 	#because grep bed and fastafrom bed is fast, just generate other.fa each time.
 
 
@@ -206,7 +209,7 @@ while ran_time < max_runtime:
 	dic_whole[ran_i]={}
 	dic_read[ran_i]={}
 	dic_len_shift[ran_i]={}
-	if read_len<46:
+	if read_len<(MIN_SCORE*2):
 		print "Their is a read too short to be compare, need to check why!"
 		sys.exit(1)
 	
@@ -221,13 +224,13 @@ while ran_time < max_runtime:
 		continue
 	
 	shift_len=0
-	#shift the 46bp seed range
-	while shift_len<(read_len-46):
+	#shift the MIN_SCORE*2bp seed range
+	while shift_len<(read_len-MIN_SCORE*2):
 		count=0
 		if seq_dir[ran_i]=="F":
-			sub_str=seq_matrix[ran_i][1][shift_len:(shift_len+46)]
+			sub_str=seq_matrix[ran_i][1][shift_len:(shift_len+MIN_SCORE*2)]
 		else:
-			sub_str=rc(seq_matrix[ran_i][1][shift_len:(shift_len+46)])
+			sub_str=rc(seq_matrix[ran_i][1][shift_len:(shift_len+MIN_SCORE*2)])
 		dic_start[ran_i][shift_len]={}
 		dic_read[ran_i][shift_len]={}
 		dic_len_shift[ran_i][shift_len]={}
@@ -348,24 +351,24 @@ h_temp_fa_all.write(">"+old_file_key+"\n"+ref_temp+"\n")
 h_temp_fa_all.close()
 #now build the supporting graph using the old key
 h_temp_aln.write("putative_reference_seq"+space_head+"^"+ref_temp+"\n")
-spcae_ID={}
+space_ID={}
 #generate alignment graph.
 dic_len_key_sort=dic_len_shift[count_max_ID][dic_count[count_max_ID][count_max]].keys()
 dic_len_key_sort.sort()
 for dic_len_key in dic_len_key_sort:
 	for key_ID in dic_len_shift[count_max_ID][dic_count[count_max_ID][count_max]][dic_len_key]:
 		space_seq=""
-		spcae_ID[key_ID]=""
+		space_ID[key_ID]=""
 		#build the output seq
 		for y in range(len_head-len(seq_matrix[key_ID][0])):
-			spcae_ID[key_ID]=spcae_ID[key_ID]+" "
+			space_ID[key_ID]=space_ID[key_ID]+" "
 		for t in range(max_left_key-1-dic_len_key):
 			space_seq=space_seq+" "
 		if seq_dir[key_ID]=="F":
 			out_seq=space_seq+seq_matrix[key_ID][1]
 		else:
 			out_seq=space_seq+rc(seq_matrix[key_ID][1])
-		h_temp_aln.write(seq_matrix[key_ID][0]+spcae_ID[key_ID]+"^"+out_seq+"\n")
+		h_temp_aln.write(seq_matrix[key_ID][0]+space_ID[key_ID]+"^"+out_seq+"\n")
 
 
 h_temp_aln.close()
@@ -384,7 +387,7 @@ for dic_len_key in dic_len_key_sort:
 			rc_out_seq=rc_space_seq+rc(seq_matrix[key_ID][1])
 		else:
 			rc_out_seq=rc_space_seq+seq_matrix[key_ID][1]
-		h_temp_aln_rev.write(seq_matrix[key_ID][0]+spcae_ID[key_ID]+"\t"+rc_out_seq+"\n")
+		h_temp_aln_rev.write(seq_matrix[key_ID][0]+space_ID[key_ID]+"\t"+rc_out_seq+"\n")
 
 h_temp_aln_rev.close()
 
