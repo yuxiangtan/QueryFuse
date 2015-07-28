@@ -338,7 +338,7 @@ if __name__ == "__main__":
     #cmd3=blat_script+" -noHead -stepSize="+str(size_query)+" -repMatch="+str(repMatch_query)+" -minIdentity="+str(new_align_percent)+" "+QUERY_FA+" "+ref_template+" "+ref_template+"query.psl"
     cmd3="python "+QF_path+"/local_aligner_wrapper_blat.py -i "+ref_template+" -r "+QUERY_FA+" -s "+str(size_query)+" -a "+str(new_align_percent)+" -o "+ref_template+"query.psl"+" -l "+str(read_len)+" -m "+MIN_SCORE
     #cmd4=blat_script+" -noHead -stepSize="+str(size_other)+" -repMatch="+str(repMatch_other)+" -minIdentity="+str(new_align_percent)+" "+genome_split_fa+" "+ref_template+" "+ref_template+"other.psl"
-    cmd4="python "+QF_path+"/local_aligner_wrapper_blat.py -i "+ref_template+" -r "+genome_split_fa+" -s "+str(size_query)+" -a "+str(new_align_percent)+" -o "+ref_template+"other.psl"+" -l "+str(read_len)+" -m "+MIN_SCORE
+    cmd4="python "+QF_path+"/local_aligner_wrapper_blat.py -i "+ref_template+" -r "+genome_split_fa+" -s "+str(size_other)+" -a "+str(new_align_percent)+" -o "+ref_template+"other.psl"+" -l "+str(read_len)+" -m "+MIN_SCORE
     
     subprocess.call(cmd1, shell = True)
     subprocess.call(cmd2, shell = True)
