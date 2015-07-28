@@ -402,7 +402,7 @@ if __name__ == "__main__":
 		
 		
 		#do supportig reads merge bp, adjustment and graphing.
-		subgroup_adjust_cmd="python "+QF_path+"/supporting_reads_merge_bp_adjustment.py "+" -d "+sub_read_file+" -k "+"^".join(filter_fusion_line.strip().split("\t"))+" -o "+SUBGROUP_FOLDER+" -O "+SUBGRAPH_FOLDER+" -q "+FUSION_BREAK_POINT_SUM_COUNT_MERGE_REF_FILT+" -Q "+sub_read+" -F "+QF_path
+		subgroup_adjust_cmd="python "+QF_path+"/supporting_reads_merge_bp_adjustment.py "+" -d "+sub_read_file+" -k "+"^".join(filter_fusion_line.strip().split("\t"))+" -o "+SUBGROUP_FOLDER+" -O "+SUBGRAPH_FOLDER+" -q "+FUSION_BREAK_POINT_SUM_COUNT_MERGE_REF_FILT+" -Q "+sub_read+" -F "+QF_path+" -m "+MIN_SCORE
 		subprocess.call(subgroup_adjust_cmd, shell = True)
 	
 	
