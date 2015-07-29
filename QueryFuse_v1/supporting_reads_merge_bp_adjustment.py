@@ -280,16 +280,16 @@ if count_max>(0.6*len(seq_matrix)):
 	max_right_ID=dic_whole[count_max_ID][count_max][max_right_key]
 	
 	if seq_dir[max_left_ID]=="F":
-		seed_seq=seq_matrix[max_left_ID][1][(max_left_key-1):(max_left_key+45)]
+		seed_seq=seq_matrix[max_left_ID][1][(max_left_key-1):(max_left_key+MIN_SCORE*2-1)]
 		left_seq=seq_matrix[max_left_ID][1][:(max_left_key-1)]
 	else:
-		seed_seq=rc(seq_matrix[max_left_ID][1])[(max_left_key-1):(max_left_key+45)]
+		seed_seq=rc(seq_matrix[max_left_ID][1])[(max_left_key-1):(max_left_key+MIN_SCORE*2-1)]
 		left_seq=rc(seq_matrix[max_left_ID][1])[:(max_left_key-1)]
 	
 	if seq_dir[max_right_ID]=="F":
-		right_seq=seq_matrix[max_right_ID][1][(max_right_key+45):]
+		right_seq=seq_matrix[max_right_ID][1][(max_right_key+MIN_SCORE*2-1):]
 	else:
-		right_seq=rc(seq_matrix[max_right_ID][1])[(max_right_key+45):]
+		right_seq=rc(seq_matrix[max_right_ID][1])[(max_right_key+MIN_SCORE*2-1):]
 	
 	ref_temp=left_seq+seed_seq+right_seq
 	#dic_seq_final=dic_read[ran_i][dic_count[count_max_ID][count_max]]
