@@ -16,7 +16,7 @@
 <li>To run QueryFuse, you need to have anaconda installed in your Linux system.</li>
 <li>After that, you need to get QueryFuse from binstar and create the running environment by:</li>
 <li> conda create -c yuxiang queryfuse -n $env_name #(Recommendation: use QF with version number is the env_name.) </li>
-<li>Once it is setup correctly, it will tell you how to activate the environment. </li>
+<li>Once it is setup correctly, it will tell you how to activate the environment. For example: source activate $env_name </li>
 
 
 
